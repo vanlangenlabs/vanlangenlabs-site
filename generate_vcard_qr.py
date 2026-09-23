@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import qrcode
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parent
@@ -12,6 +12,9 @@ VCARD_URL_QR_PATH = ROOT / "docs" / "pwr" / "vcard-url.png"
 VCARD_URL = "https://vanlangen.org/pwr/pwrpack.vcf"
 
 QR_SIZE = 1200
+LABEL_HEIGHT = 150
+LABEL_PADDING = 32
+LABEL_FONT_SIZE = 64
 BASE_QR_SIZE = 300
 BASE_LOGO_BOX_SIZE = 68
 BASE_LOGO_PADDING = 8
@@ -61,13 +64,35 @@ def make_logo_overlay() -> Image.Image:
     return overlay
 
 
-def save_qr_png(data: str, output_path: Path) -> None:
+def make_label_font() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    for font_path in (Path("C:/Windows/Fonts/segoeui.ttf"), Path("C:/Windows/Fonts/arial.ttf")):
+        if font_path.exists():
+            return ImageFont.truetype(str(font_path), LABEL_FONT_SIZE)
+    return ImageFont.load_default()
+
+
+def add_label(image: Image.Image, label: str) -> Image.Image:
+    labeled_image = Image.new("RGBA", (QR_SIZE, QR_SIZE + LABEL_HEIGHT), "white")
+    labeled_image.paste(image, (0, LABEL_HEIGHT))
+
+    draw = ImageDraw.Draw(labeled_image)
+    font = make_label_font()
+    bounds = draw.textbbox((0, 0), label, font=font)
+    text_width = bounds[2] - bounds[0]
+    text_y = (LABEL_HEIGHT - (bounds[3] - bounds[1])) // 2 - bounds[1]
+    draw.text(((QR_SIZE - text_width) // 2, text_y), label, fill="black", font=font)
+    return labeled_image
+
+
+def save_qr_png(data: str, output_path: Path, label: str | None = None) -> None:
     qr_image = make_qr_image(data)
     logo_overlay = make_logo_overlay()
 
     overlay_x = (QR_SIZE - LOGO_BOX_SIZE) // 2
     overlay_y = (QR_SIZE - LOGO_BOX_SIZE) // 2
     qr_image.alpha_composite(logo_overlay, (overlay_x, overlay_y))
+    if label:
+        qr_image = add_label(qr_image, label)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     qr_image.convert("RGB").save(output_path, "PNG", optimize=True)
@@ -76,7 +101,8 @@ def save_qr_png(data: str, output_path: Path) -> None:
 
 def main() -> None:
     vcard_text = VCARD_PATH.read_text(encoding="utf-8").strip()
-    save_qr_png(vcard_text, VCARD_QR_PATH)
+    label = next((line[3:] for line in vcard_text.splitlines() if line.startswith("FN:")), "")
+    save_qr_png(vcard_text, VCARD_QR_PATH, label)
     save_qr_png(VCARD_URL, VCARD_URL_QR_PATH)
 
 
