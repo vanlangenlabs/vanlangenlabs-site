@@ -65,10 +65,17 @@ def make_logo_overlay() -> Image.Image:
 
 
 def make_label_font() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    for font_path in (Path("C:/Windows/Fonts/segoeuib.ttf"), Path("C:/Windows/Fonts/arialbd.ttf")):
+    font_paths = (
+        Path("C:/Windows/Fonts/segoeuib.ttf"),
+        Path("C:/Windows/Fonts/arialbd.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+        Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"),
+        Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
+    )
+    for font_path in font_paths:
         if font_path.exists():
             return ImageFont.truetype(str(font_path), LABEL_FONT_SIZE)
-    return ImageFont.load_default()
+    return ImageFont.load_default(size=LABEL_FONT_SIZE)
 
 
 def add_label(image: Image.Image, label: str) -> Image.Image:
