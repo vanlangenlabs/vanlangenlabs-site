@@ -5,11 +5,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parent
-VCARD_PATH = ROOT / "docs" / "pwr" / "pwrpack.vcf"
+VCARD_PATH = ROOT / "docs" / "pwr" / "pwr.vcf"
 LOGO_PATH = ROOT / "docs" / "pwr" / "pwr-logo.png"
 VCARD_QR_PATH = ROOT / "docs" / "pwr" / "vcard.png"
 VCARD_URL_QR_PATH = ROOT / "docs" / "pwr" / "vcard-url.png"
-VCARD_URL = "https://vanlangen.org/pwr/pwrpack.vcf"
+VCARD_URL = "https://vanlangen.org/pwr/pwr.vcf"
 
 QR_SIZE = 1200
 LABEL_HEIGHT = 220

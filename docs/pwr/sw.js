@@ -1,11 +1,11 @@
-const CACHE_NAME = "pwr-contact-v3";
+const CACHE_NAME = "pwr-contact-v5";
 
 const FILES = [
   "/pwr/",
   "/pwr/manifest.webmanifest",
   "/pwr/pwr-icon-192.png",
   "/pwr/pwr-icon-512.png",
-  "/pwr/pwrpack.vcf",
+  "/pwr/pwr.vcf",
   "/pwr/vcard-url.png",
   "/pwr/vcard.png"
 ];
