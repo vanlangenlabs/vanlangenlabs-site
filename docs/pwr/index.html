@@ -1,4 +1,16 @@
-<div style="position: relative; width: 300px; height: 300px;">
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contactgegevens – Jeroen van Langen</title>
+</head>
+<body>
+  <h1>Jeroen van Langen</h1>
+
+  <a href="/pwrpack.vcf">Contact opslaan</a>
+  
+  <div style="position: relative; width: 300px; height: 300px;">
   <div id="qr"></div>
   <div style="
     position: absolute;
@@ -16,7 +28,7 @@
   </div>
 </div>
 
-<script src="/assets/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
   new QRCode(document.getElementById("qr"), {
     text: new URL("/pwr/pwrpack.vcf", location.origin).href,
@@ -25,3 +37,5 @@
     correctLevel: QRCode.CorrectLevel.H
   });
 </script>
+</body>
+</html>
