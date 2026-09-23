@@ -1,26 +1,27 @@
-<!doctype html>
-<html lang="nl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contactgegevens – Jeroen van Langen</title>
-</head>
-<body>
-  <h1>Jeroen van Langen</h1>
-
-  <a href="pwrpack.vcf">Contact opslaan</a>
+<div style="position: relative; width: 300px; height: 300px;">
   <div id="qr"></div>
+  <div style="
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    padding: 8px;
+    background: white;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;">
+    <img src="/images/pwr-logo.png"
+         alt="PWR Pack"
+         style="max-width: 100%; max-height: 100%; object-fit: contain;">
+  </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script>
-    const contactUrl = new URL("/pwrpack.vcf", location.origin).href;
-
-    new QRCode(document.getElementById("qr"), {
-      text: contactUrl,
-      width: 300,
-      height: 300,
-      correctLevel: QRCode.CorrectLevel.H
-    });
-  </script>
-</body>
-</html>
+<script src="/assets/qrcode.min.js"></script>
+<script>
+  new QRCode(document.getElementById("qr"), {
+    text: new URL("/pwrpack.vcf", location.origin).href,
+    width: 300,
+    height: 300,
+    correctLevel: QRCode.CorrectLevel.H
+  });
+</script>
