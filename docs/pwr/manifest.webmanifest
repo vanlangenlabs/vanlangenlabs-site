@@ -1,0 +1,21 @@
+{
+  "name": "PWR Pack Contact Card",
+  "short_name": "PWR Contact",
+  "start_url": "/pwr/",
+  "scope": "/pwr/",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#15a05c",
+  "icons": [
+    {
+      "src": "/pwr/pwr-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwr/vcard-url.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
