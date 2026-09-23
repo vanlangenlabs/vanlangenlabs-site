@@ -12,9 +12,9 @@ VCARD_URL_QR_PATH = ROOT / "docs" / "pwr" / "vcard-url.png"
 VCARD_URL = "https://vanlangen.org/pwr/pwrpack.vcf"
 
 QR_SIZE = 1200
-LABEL_HEIGHT = 150
+LABEL_HEIGHT = 180
 LABEL_PADDING = 32
-LABEL_FONT_SIZE = 64
+LABEL_FONT_SIZE = 96
 BASE_QR_SIZE = 300
 BASE_LOGO_BOX_SIZE = 68
 BASE_LOGO_PADDING = 8
@@ -103,7 +103,7 @@ def main() -> None:
     vcard_text = VCARD_PATH.read_text(encoding="utf-8").strip()
     label = next((line[3:] for line in vcard_text.splitlines() if line.startswith("FN:")), "")
     save_qr_png(vcard_text, VCARD_QR_PATH, label)
-    save_qr_png(VCARD_URL, VCARD_URL_QR_PATH)
+    save_qr_png(VCARD_URL, VCARD_URL_QR_PATH, label)
 
 
 if __name__ == "__main__":

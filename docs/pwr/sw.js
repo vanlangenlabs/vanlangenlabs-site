@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwr-contact-v2";
+const CACHE_NAME = "pwr-contact-v3";
 
 const FILES = [
   "/pwr/",
