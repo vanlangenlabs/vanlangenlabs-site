@@ -1,6 +1,7 @@
 {
   "name": "PWR Pack Contact Card",
   "short_name": "PWR Contact",
+  "id": "/pwr/",
   "start_url": "/pwr/",
   "scope": "/pwr/",
   "display": "standalone",
@@ -8,14 +9,16 @@
   "theme_color": "#15a05c",
   "icons": [
     {
-      "src": "/pwr/pwr-logo.png",
+      "src": "/pwr/pwr-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/pwr/vcard-url.png",
+      "src": "/pwr/pwr-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
