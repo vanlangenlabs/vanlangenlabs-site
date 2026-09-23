@@ -12,9 +12,9 @@ VCARD_URL_QR_PATH = ROOT / "docs" / "pwr" / "vcard-url.png"
 VCARD_URL = "https://vanlangen.org/pwr/pwrpack.vcf"
 
 QR_SIZE = 1200
-LABEL_HEIGHT = 180
+LABEL_HEIGHT = 220
 LABEL_PADDING = 32
-LABEL_FONT_SIZE = 96
+LABEL_FONT_SIZE = 86
 BASE_QR_SIZE = 300
 BASE_LOGO_BOX_SIZE = 68
 BASE_LOGO_PADDING = 8
@@ -65,7 +65,7 @@ def make_logo_overlay() -> Image.Image:
 
 
 def make_label_font() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    for font_path in (Path("C:/Windows/Fonts/segoeui.ttf"), Path("C:/Windows/Fonts/arial.ttf")):
+    for font_path in (Path("C:/Windows/Fonts/segoeuib.ttf"), Path("C:/Windows/Fonts/arialbd.ttf")):
         if font_path.exists():
             return ImageFont.truetype(str(font_path), LABEL_FONT_SIZE)
     return ImageFont.load_default()
