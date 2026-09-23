@@ -13,8 +13,8 @@ VCARD_URL = "https://vanlangen.org/pwr/pwr.vcf"
 
 QR_SIZE = 1200
 LABEL_HEIGHT = 220
-LABEL_PADDING = 32
 LABEL_FONT_SIZE = 86
+
 BASE_QR_SIZE = 300
 BASE_LOGO_BOX_SIZE = 68
 BASE_LOGO_PADDING = 8
@@ -25,14 +25,19 @@ LOGO_BOX_SIZE = round(BASE_LOGO_BOX_SIZE * SCALE)
 LOGO_PADDING = round(BASE_LOGO_PADDING * SCALE)
 LOGO_BOX_RADIUS = round(BASE_LOGO_BOX_RADIUS * SCALE)
 
+BLACK = (0, 0, 0)
+GREEN = (21, 160, 92)     # #15a05c
+WHITE = (255, 255, 255)
+UNUSED = (255, 0, 255)    # ongebruikte 4e palette-entry
 
-def make_qr_image(vcard_text: str) -> Image.Image:
+
+def make_qr_image(data: str) -> Image.Image:
     qr = qrcode.QRCode(
         error_correction=qrcode.constants.ERROR_CORRECT_H,
         box_size=10,
         border=4,
     )
-    qr.add_data(vcard_text)
+    qr.add_data(data)
     qr.make(fit=True)
 
     image = qr.make_image(fill_color="black", back_color="white").convert("RGBA")
@@ -43,19 +48,24 @@ def remove_photo(vcard_text: str) -> str:
     lines = vcard_text.splitlines()
     kept_lines = []
     skipping_photo = False
+
     for line in lines:
         if line.startswith("PHOTO;"):
             skipping_photo = True
             continue
+
         if skipping_photo and line.startswith(" "):
             continue
+
         skipping_photo = False
         kept_lines.append(line)
+
     return "\n".join(kept_lines)
 
 
 def make_logo_overlay() -> Image.Image:
     overlay = Image.new("RGBA", (LOGO_BOX_SIZE, LOGO_BOX_SIZE), (255, 255, 255, 0))
+
     mask = Image.new("L", (LOGO_BOX_SIZE, LOGO_BOX_SIZE), 0)
     ImageDraw.Draw(mask).rounded_rectangle(
         (0, 0, LOGO_BOX_SIZE, LOGO_BOX_SIZE),
@@ -68,10 +78,12 @@ def make_logo_overlay() -> Image.Image:
 
     logo_size = LOGO_BOX_SIZE - LOGO_PADDING * 2
     logo = Image.open(LOGO_PATH).convert("RGBA")
+
     logo_scale = min(logo_size / logo.width, logo_size / logo.height)
     logo_width = round(logo.width * logo_scale)
     logo_height = round(logo.height * logo_scale)
     logo = logo.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
+
     logo_x = (LOGO_BOX_SIZE - logo.width) // 2
     logo_y = (LOGO_BOX_SIZE - logo.height) // 2
     overlay.alpha_composite(logo, (logo_x, logo_y))
@@ -87,10 +99,12 @@ def make_label_font() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
         Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"),
         Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
     )
+
     for font_path in font_paths:
         if font_path.exists():
             return ImageFont.truetype(str(font_path), LABEL_FONT_SIZE)
-    return ImageFont.load_default(size=LABEL_FONT_SIZE)
+
+    return ImageFont.load_default()
 
 
 def add_label(image: Image.Image, label: str) -> Image.Image:
@@ -100,10 +114,44 @@ def add_label(image: Image.Image, label: str) -> Image.Image:
     draw = ImageDraw.Draw(labeled_image)
     font = make_label_font()
     bounds = draw.textbbox((0, 0), label, font=font)
+
     text_width = bounds[2] - bounds[0]
-    text_y = (LABEL_HEIGHT - (bounds[3] - bounds[1])) // 2 - bounds[1]
-    draw.text(((QR_SIZE - text_width) // 2, text_y), label, fill="black", font=font)
+    text_height = bounds[3] - bounds[1]
+    text_x = (QR_SIZE - text_width) // 2
+    text_y = (LABEL_HEIGHT - text_height) // 2 - bounds[1]
+
+    draw.text((text_x, text_y), label, fill="black", font=font)
     return labeled_image
+
+
+def to_fixed_palette_image(image: Image.Image) -> Image.Image:
+    # Zet alles eerst op een vaste witte achtergrond.
+    rgb_image = Image.new("RGB", image.size, WHITE)
+    if "A" in image.getbands():
+        rgb_image.paste(image, mask=image.getchannel("A"))
+    else:
+        rgb_image.paste(image)
+
+    # Maak een vaste palette-afbeelding met exact 4 palette entries.
+    palette_image = Image.new("P", (1, 1))
+    flat_palette = [
+        *BLACK,   # index 0
+        *GREEN,   # index 1
+        *WHITE,   # index 2
+        *UNUSED,  # index 3 (ongebruikt, maar nodig omdat 2-bit max 4 kleuren is)
+    ]
+
+    # PNG palette verwacht 256 * 3 waarden.
+    flat_palette.extend([0, 0, 0] * (256 - 4))
+    palette_image.putpalette(flat_palette)
+
+    # Quantize naar exact dit palette, zonder dithering.
+    indexed_image = rgb_image.quantize(
+        palette=palette_image,
+        dither=Image.Dither.NONE,
+    )
+
+    return indexed_image
 
 
 def save_qr_png(data: str, output_path: Path, label: str | None = None) -> None:
@@ -113,17 +161,28 @@ def save_qr_png(data: str, output_path: Path, label: str | None = None) -> None:
     overlay_x = (QR_SIZE - LOGO_BOX_SIZE) // 2
     overlay_y = (QR_SIZE - LOGO_BOX_SIZE) // 2
     qr_image.alpha_composite(logo_overlay, (overlay_x, overlay_y))
+
     if label:
         qr_image = add_label(qr_image, label)
 
+    indexed_image = to_fixed_palette_image(qr_image)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    qr_image.convert("RGB").save(output_path, "PNG", optimize=True)
-    print(f"Generated {output_path.relative_to(ROOT)}")
+    indexed_image.save(
+        output_path,
+        "PNG",
+        optimize=True,
+        bits=2,
+    )
+
+    size = output_path.stat().st_size
+    print(f"Generated {output_path.relative_to(ROOT)} ({size} bytes)")
 
 
 def main() -> None:
     vcard_text = VCARD_PATH.read_text(encoding="utf-8").strip()
     compact_vcard = remove_photo(vcard_text)
+
     save_qr_png(compact_vcard, VCARD_QR_PATH)
     save_qr_png(VCARD_URL, VCARD_URL_QR_PATH)
 
