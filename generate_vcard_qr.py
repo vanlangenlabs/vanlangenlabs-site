@@ -1,5 +1,3 @@
-import base64
-import textwrap
 from pathlib import Path
 
 import qrcode
@@ -9,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent
 VCARD_PATH = ROOT / "docs" / "pwr" / "pwr.vcf"
 LOGO_PATH = ROOT / "docs" / "pwr" / "pwr-logo.png"
-PROFILE_PATH = ROOT / "docs" / "pwr" / "profile.jpg"
 VCARD_QR_PATH = ROOT / "docs" / "pwr" / "vcard.png"
 VCARD_URL_QR_PATH = ROOT / "docs" / "pwr" / "vcard-url.png"
 VCARD_URL = "https://vanlangen.org/pwr/pwr.vcf"
@@ -55,21 +52,6 @@ def remove_photo(vcard_text: str) -> str:
         skipping_photo = False
         kept_lines.append(line)
     return "\n".join(kept_lines)
-
-
-def embed_photo(vcard_text: str) -> str:
-    encoded_photo = base64.b64encode(PROFILE_PATH.read_bytes()).decode("ascii")
-    prefix = "PHOTO;ENCODING=b;TYPE=JPEG:"
-    first_chunk_size = 75 - len(prefix)
-    chunks = [encoded_photo[:first_chunk_size]]
-    chunks.extend(textwrap.wrap(encoded_photo[first_chunk_size:], 74))
-    photo_lines = [f"{prefix}{chunks[0]}"]
-    photo_lines.extend(f" {chunk}" for chunk in chunks[1:])
-
-    lines = vcard_text.splitlines()
-    n_index = next(index for index, line in enumerate(lines) if line.startswith("N:"))
-    lines[n_index + 1:n_index + 1] = photo_lines
-    return "\n".join(lines)
 
 
 def make_logo_overlay() -> Image.Image:
@@ -142,8 +124,6 @@ def save_qr_png(data: str, output_path: Path, label: str | None = None) -> None:
 def main() -> None:
     vcard_text = VCARD_PATH.read_text(encoding="utf-8").strip()
     compact_vcard = remove_photo(vcard_text)
-    online_vcard = embed_photo(compact_vcard)
-    VCARD_PATH.write_text(online_vcard + "\n", encoding="utf-8")
     save_qr_png(compact_vcard, VCARD_QR_PATH)
     save_qr_png(VCARD_URL, VCARD_URL_QR_PATH)
 
