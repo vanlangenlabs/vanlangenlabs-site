@@ -108,9 +108,8 @@ def save_qr_png(data: str, output_path: Path, label: str | None = None) -> None:
 
 def main() -> None:
     vcard_text = VCARD_PATH.read_text(encoding="utf-8").strip()
-    label = next((line[3:] for line in vcard_text.splitlines() if line.startswith("FN:")), "")
-    save_qr_png(vcard_text, VCARD_QR_PATH, label)
-    save_qr_png(VCARD_URL, VCARD_URL_QR_PATH, label)
+    save_qr_png(vcard_text, VCARD_QR_PATH)
+    save_qr_png(VCARD_URL, VCARD_URL_QR_PATH)
 
 
 if __name__ == "__main__":
