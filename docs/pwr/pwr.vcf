@@ -2,10 +2,8 @@ BEGIN:VCARD
 VERSION:3.0
 FN:Jeroen van Langen
 N:van Langen;Jeroen;;;
-PHOTO;VALUE=URI:https://vanlangen.org/pwr/profile.jpg
 ORG:PWR Pack International B.V.
 TITLE:Software Product Architect
-TEL;TYPE=CELL:+31651169414
 TEL;TYPE=WORK:+31318519757
 EMAIL;TYPE=WORK:jvanlangen@pwrpack.com
 URL:https://pwrpack.com
