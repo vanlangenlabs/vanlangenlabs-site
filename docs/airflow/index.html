@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="AIRFlow: a read-only online viewer for AI Routing Flow workflows.">
-  <title>AIRFlow Viewer | AI Routing Flow</title>
+  <meta name="description" content="AIRFlow: an online diagram viewer for AI software development workflows, with original Mermaid sources for AI agents and Copilot instructions.">
+  <title>AIRFlow Viewer | AI Workflow Diagrams</title>
   <link rel="stylesheet" href="css/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
   <script defer src="js/viewer.js"></script>
 </head>
 <body>
   <header class="header">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AIRFlow Viewer</h1><p>AI Routing Flow &middot; Online viewer</p></div></div>
-    <label class="theme-switch"><input id="theme" type="checkbox" role="switch"><span>Dark theme</span></label>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AIRFlow Viewer</h1><p>AI Routing Flow &middot; AI workflow diagrams</p></div></div>
+    <div class="header-actions"><button id="get-started" type="button" class="get-started" aria-haspopup="dialog">Get started</button><label class="theme-switch"><input id="theme" type="checkbox" role="switch"><span>Dark theme</span></label></div>
   </header>
   <main class="viewer-layout">
     <aside class="sidebar">
@@ -26,9 +26,9 @@
     <div class="viewer-content">
     <section class="workspace" aria-label="Workflow viewer">
       <div class="toolbar">
-        <div class="file-actions"><a id="raw-link" href="flows/project.air.mmd" target="_blank" rel="noopener">Raw source <span aria-hidden="true">&#8599;</span></a><button id="download" class="download" disabled><span aria-hidden="true">&#8595;</span> Download</button></div>
+        <div class="file-actions"><a id="raw-link" href="flows/project.air.mmd" target="_blank" rel="noopener">Raw Mermaid source <span aria-hidden="true">&#8599;</span></a><button id="copy-ai" class="copy-ai" disabled>Copy AI reference</button><button id="download" class="download" disabled><span aria-hidden="true">&#8595;</span> Download</button></div>
       </div>
-      <nav class="breadcrumbs" aria-label="Workflow hierarchy"><ol id="breadcrumbs"></ol><span class="viewer-mode">Read-only</span></nav>
+      <nav class="breadcrumbs" aria-label="Workflow hierarchy"><ol id="breadcrumbs"></ol><span class="viewer-mode">Read-only diagram</span></nav>
       <div class="diagram-heading"><h2 id="flow-title">project<span>.air.mmd</span></h2><span id="status" role="status" aria-live="polite">Loading workflow...</span></div>
       <div id="viewport" class="viewport" tabindex="0" aria-label="Workflow diagram" aria-busy="true">
         <div id="diagram" class="diagram"></div>
@@ -49,6 +49,26 @@
     </details>
     </div>
   </main>
+  <dialog id="get-started-dialog" aria-labelledby="get-started-title">
+    <div class="dialog-content">
+      <header class="dialog-header"><h2 id="get-started-title">AI workflow diagrams</h2><button id="close-get-started" type="button" class="close-dialog" aria-label="Close Get started" title="Close" autofocus>&times;</button></header>
+      <div class="ai-context">
+        <p>AIRFlow describes AI software development workflows as Mermaid diagrams. People view the diagram; AI agents read the original <code>.air.mmd</code> source. This is a read-only viewer, not an editor or an agent runner.</p>
+        <h3>Use with AI / Copilot</h3>
+        <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download standard Copilot instructions</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. The standard instructions already reference the shared Project workflow; no viewer setup is required.</p>
+        <p>Copy AI reference uses the same standard instructions and adds the selected diagram as context. The agent must still enter through Project, not start independently at that diagram.</p>
+        <a id="ai-source-link" hidden></a>
+        <h3>Project calls the subflows</h3>
+        <p>Always read Project first and follow its sequence. A referenced Mermaid file is a subflow call: retrieve it, follow its steps and feedback loops, then return to Project only after successful completion and the required human approval. Project then determines the next phase; the agent does not freely choose one.</p>
+        <p>The diagram defines the process, not the current project state. Record the active phase, approvals and relevant artifacts in the consuming repository so an agent can determine where to continue.</p>
+        <p>For project-specific workflows, keep the Mermaid files in your repo and reference their local paths. For shared remote workflows, pin a release or commit for reproducible instructions. Web access depends on the AI agent's tools and permissions.</p>
+      </div>
+      <div class="reference-heading"><h3>AI instruction fragment</h3><button id="copy-ai-dialog" class="copy-ai" type="button" disabled>Copy AI reference</button></div>
+      <p id="instructions-status" role="status">Loading standard instructions...</p>
+      <p id="ai-copy-status" role="status" aria-live="polite"></p>
+      <pre><code id="ai-reference"></code></pre>
+    </div>
+  </dialog>
   <footer><span>AIRFlow <span class="footer-dot" aria-hidden="true">/</span> AI Routing Flow</span><span>One source. Human &amp; AI.</span></footer>
 </body>
 </html>

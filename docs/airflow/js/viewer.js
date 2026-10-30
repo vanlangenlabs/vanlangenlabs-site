@@ -5,9 +5,12 @@ const viewport = byId('viewport');
 const diagram = byId('diagram');
 const themeSwitch = byId('theme');
 const zoomButtons = ['zoom-in', 'zoom-out', 'reset'].map(byId);
+const aiCopyButtons = ['copy-ai', 'copy-ai-dialog'].map(byId);
+const gettingStarted = byId('get-started-dialog');
 const validName = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;
 let navigationEntries = new Map();
 let source = '';
+let instructionTemplate = '';
 let flowName = 'project';
 let requestId = 0;
 let controller;
@@ -235,6 +238,19 @@ function renderSource(id) {
   return renderQueue;
 }
 
+async function loadInstructions() {
+  try {
+    const response = await fetch(new URL('copilot-instructions.md', location.href), { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    if (!text.trim()) throw new Error('The instructions file is empty.');
+    instructionTemplate = text;
+    byId('instructions-status').hidden = true;
+  } catch (error) {
+    byId('instructions-status').textContent = `Could not load standard Copilot instructions. ${error.message}`;
+  }
+}
+
 async function loadFlow(name) {
   const id = ++requestId;
   if (controller) controller.abort();
@@ -247,6 +263,10 @@ async function loadFlow(name) {
   byId('download').disabled = true;
   byId('copy').disabled = true;
   byId('copy').textContent = 'Copy source';
+  aiCopyButtons.forEach((button) => { button.disabled = true; button.textContent = 'Copy AI reference'; });
+  byId('ai-reference').textContent = '';
+  byId('ai-copy-status').textContent = '';
+  byId('ai-source-link').hidden = true;
   zoomButtons.forEach((button) => { button.disabled = true; });
   byId('raw-link').hidden = true;
   viewport.setAttribute('aria-busy', 'true');
@@ -281,6 +301,13 @@ async function loadFlow(name) {
     byId('source').textContent = source;
     byId('download').disabled = false;
     byId('copy').disabled = false;
+    byId('ai-source-link').href = url.href;
+    byId('ai-source-link').textContent = url.href;
+    byId('ai-source-link').hidden = false;
+    if (instructionTemplate) {
+      byId('ai-reference').textContent = `${instructionTemplate.trimEnd()}\n\n## Selected Diagram (Context Only)\n\n${url.href}\n\nThe entry point remains Project; this reference does not authorize skipping subflows.\n`;
+      aiCopyButtons.forEach((button) => { button.disabled = false; });
+    }
     await renderSource(id);
   } catch (error) {
     if (id !== requestId || error.name === 'AbortError') return;
@@ -358,4 +385,37 @@ byId('copy').addEventListener('click', async () => {
   }
 });
 
-loadNavigation().then(() => loadFlow(new URLSearchParams(location.search).get('flow') ?? 'project'));
+async function copyAIReference() {
+  const reference = byId('ai-reference').textContent;
+  if (!reference) return;
+  try {
+    await navigator.clipboard.writeText(reference);
+    aiCopyButtons.forEach((button) => { button.textContent = 'Copied'; });
+    byId('ai-copy-status').textContent = 'AI reference copied.';
+  } catch {
+    aiCopyButtons.forEach((button) => { button.textContent = 'Copy AI reference'; });
+    if (!gettingStarted.open) gettingStarted.showModal();
+    byId('ai-copy-status').textContent = 'Clipboard unavailable. The instruction fragment is selected for manual copying.';
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(byId('ai-reference'));
+    selection.removeAllRanges();
+    selection.addRange(range);
+    byId('ai-reference').scrollIntoView({ block: 'nearest' });
+  }
+}
+
+aiCopyButtons.forEach((button) => button.addEventListener('click', copyAIReference));
+byId('get-started').addEventListener('click', () => gettingStarted.showModal());
+byId('close-get-started').addEventListener('click', () => gettingStarted.close());
+gettingStarted.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    gettingStarted.close();
+  }
+});
+gettingStarted.addEventListener('click', (event) => {
+  if (event.target === gettingStarted) gettingStarted.close();
+});
+
+Promise.all([loadNavigation(), loadInstructions()]).then(() => loadFlow(new URLSearchParams(location.search).get('flow') ?? 'project'));

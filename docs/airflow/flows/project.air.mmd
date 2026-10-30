@@ -1,9 +1,9 @@
 flowchart LR
-    start([Start project]) --> concept["Concept: concept.air.mmd"]
-    concept --> definition["Definition: definition.air.mmd"]
-    definition --> design["Design: design.air.mmd"]
-    design --> delivery["Delivery: delivery.air.mmd"]
-    delivery --> release([Release])
+    start([Start project]) --> concept[["Concept: concept.air.mmd"]]
+    concept -- Concept approved: return --> definition[["Definition: definition.air.mmd"]]
+    definition -- Definition approved: return --> design[["Design: design.air.mmd"]]
+    design -- Design approved: return --> delivery[["Delivery: delivery.air.mmd"]]
+    delivery -- Tests and review passed: return --> release([Release])
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
     class start,release boundary
