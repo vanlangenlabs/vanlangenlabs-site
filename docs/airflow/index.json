@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Project",
+    "flow": "project",
+    "children": [
+      { "title": "Concept", "flow": "concept" },
+      { "title": "Definition", "flow": "definition" },
+      { "title": "Design", "flow": "design" },
+      { "title": "Delivery", "flow": "delivery" }
+    ]
+  }
+]
