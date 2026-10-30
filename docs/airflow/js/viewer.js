@@ -418,4 +418,13 @@ gettingStarted.addEventListener('click', (event) => {
   if (event.target === gettingStarted) gettingStarted.close();
 });
 
+let hasSeenGettingStarted = false;
+try {
+  hasSeenGettingStarted = localStorage.getItem('airflow-get-started-seen') === 'true';
+} catch {}
+if (!hasSeenGettingStarted) {
+  gettingStarted.showModal();
+  try { localStorage.setItem('airflow-get-started-seen', 'true'); } catch {}
+}
+
 Promise.all([loadNavigation(), loadInstructions()]).then(() => loadFlow(new URLSearchParams(location.search).get('flow') ?? 'project'));
