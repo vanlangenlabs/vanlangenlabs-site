@@ -1,0 +1,13 @@
+flowchart TD
+    start([Plan a release]) --> readBacklog[Read approved feature definitions and project concept]
+    readBacklog --> propose[Propose a coherent feature set for a version]
+    propose --> scopeApproval{User approves release scope?}
+    scopeApproval -- No: revise proposed scope --> propose
+    scopeApproval -- Defer release planning --> planningDeferred([Release planning deferred])
+    scopeApproval -- Yes: record version and feature IDs --> scope[Write release scope in `.air/releases/version/scope.md`]
+    scope --> scopeReady([Release scope approved])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    class start,scopeReady,planningDeferred boundary
+    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
+    class scopeApproval approval

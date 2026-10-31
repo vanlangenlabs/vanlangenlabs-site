@@ -9,6 +9,7 @@ const aiCopyButtons = ['copy-ai', 'copy-ai-dialog'].map(byId);
 const gettingStarted = byId('get-started-dialog');
 const validName = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;
 let navigationEntries = new Map();
+let nodeContexts = new Map();
 let source = '';
 let instructionTemplate = '';
 let flowName = 'project';
@@ -158,31 +159,133 @@ function updateBreadcrumbs() {
   });
 }
 
+function parseNodeContexts(text) {
+  const contexts = new Map();
+  let current = null;
+  text.split(/\r?\n/).forEach((line) => {
+    const start = line.match(/^\s*%%\s*@airflow-context\s+([A-Za-z0-9_-]+)\s*$/);
+    if (start) {
+      current = { id: start[1], lines: [] };
+      return;
+    }
+    if (/^\s*%%\s*@end-airflow-context\s*$/.test(line)) {
+      if (current && !contexts.has(current.id)) contexts.set(current.id, current.lines.join('\n').trim());
+      current = null;
+      return;
+    }
+    if (current) {
+      const comment = line.match(/^\s*%%(?: ?)(.*)$/);
+      current.lines.push(comment ? comment[1] : '');
+    }
+  });
+  return contexts;
+}
+
+function appendInlineMarkdown(container, text) {
+  const tokens = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+  let offset = 0;
+  for (const match of text.matchAll(tokens)) {
+    container.append(document.createTextNode(text.slice(offset, match.index)));
+    const value = match[0];
+    const element = value.startsWith('**') ? document.createElement('strong') : document.createElement('code');
+    element.textContent = value.startsWith('**') ? value.slice(2, -2) : value.slice(1, -1);
+    container.append(element);
+    offset = match.index + value.length;
+  }
+  container.append(document.createTextNode(text.slice(offset)));
+}
+
+function renderContextMarkdown(markdown) {
+  const fragment = document.createDocumentFragment();
+  let paragraph = [];
+  let list;
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    const element = document.createElement('p');
+    appendInlineMarkdown(element, paragraph.join(' '));
+    fragment.append(element);
+    paragraph = [];
+  };
+  const flushList = () => { list = null; };
+
+  markdown.split('\n').forEach((line) => {
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    const item = line.match(/^\s*[-*]\s+(.+)$/);
+    if (!line.trim()) {
+      flushParagraph();
+      flushList();
+    } else if (heading) {
+      flushParagraph();
+      flushList();
+      const element = document.createElement(`h${heading[1].length + 2}`);
+      appendInlineMarkdown(element, heading[2]);
+      fragment.append(element);
+    } else if (item) {
+      flushParagraph();
+      if (!list) {
+        list = document.createElement('ul');
+        fragment.append(list);
+      }
+      const element = document.createElement('li');
+      appendInlineMarkdown(element, item[1]);
+      list.append(element);
+    } else {
+      flushList();
+      paragraph.push(line.trim());
+    }
+  });
+  flushParagraph();
+  return fragment;
+}
+
+function showNodeContext(link) {
+  const context = nodeContexts.get(link.dataset.nodeContext);
+  if (!context) return false;
+  byId('node-context-title').textContent = link.dataset.nodeTitle;
+  byId('node-context-content').replaceChildren(renderContextMarkdown(context));
+  const subflow = byId('open-subflow');
+  subflow.hidden = !link.dataset.flowHref;
+  if (link.dataset.flowHref) subflow.href = link.dataset.flowHref;
+  byId('node-context-dialog').showModal();
+  return true;
+}
+
 function linkWorkflows(svg) {
   svg.querySelectorAll('g.node').forEach((node) => {
     const label = node.querySelector('.label')?.textContent.trim();
-    const reference = label?.match(/(?:^|:\s*)([A-Za-z0-9][A-Za-z0-9_-]{0,79})\.air\.mmd$/);
-    if (!reference || node.closest('a')) return;
-    const target = reference[1];
+    const reference = label?.match(/(?:^|:\s*)([A-Za-z0-9][A-Za-z0-9_-]{0,79})\.mmd$/);
+    const nodeId = node.id.match(/^flowchart-(.+)-\d+$/)?.[1];
+    const hasContext = nodeContexts.has(nodeId);
+    if ((!reference && !hasContext) || node.closest('a')) return;
+    const target = reference?.[1];
     const trail = [...ancestorPath(), flowName];
-    const existing = trail.indexOf(target);
+    const existing = target ? trail.indexOf(target) : -1;
     const ancestors = existing < 0 ? trail.slice(-32) : trail.slice(0, existing);
     const link = document.createElementNS('http://www.w3.org/2000/svg', 'a');
-    link.setAttribute('href', flowUrl(target, ancestors).href);
-    link.setAttribute('class', 'flow-link');
-    link.setAttribute('aria-label', `Open ${target} workflow`);
+    link.setAttribute('href', target ? flowUrl(target, ancestors).href : '#node-context');
+    link.setAttribute('class', `${target ? 'flow-link' : ''}${hasContext ? ' context-link' : ''}`.trim());
+    if (hasContext) {
+      const titleText = label?.replace(/:\s*[A-Za-z0-9_-]+\.mmd$/, '') || nodeId;
+      link.dataset.nodeContext = nodeId;
+      link.dataset.nodeTitle = titleText;
+      if (target) link.dataset.flowHref = flowUrl(target, ancestors).href;
+      link.setAttribute('aria-label', `Show context for ${titleText}`);
+    } else {
+      link.setAttribute('aria-label', `Open ${target} workflow`);
+    }
     link.setAttribute('tabindex', '0');
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    title.textContent = `Open ${target} workflow`;
+    title.textContent = hasContext ? `Show context for ${link.dataset.nodeTitle}` : `Open ${target} workflow`;
     node.before(link);
     link.append(title, node);
   });
 }
 
 function followWorkflowLink(event) {
-  const link = event.target.closest('a.flow-link, #breadcrumbs a, #workflow-tree a');
+  const link = event.target.closest('a.flow-link, a.context-link, #breadcrumbs a, #workflow-tree a');
   if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
+  if (link.dataset.nodeContext && showNodeContext(link)) return;
   const href = link.getAttribute('href');
   history.pushState(null, '', href);
   loadFlow(new URL(href).searchParams.get('flow'));
@@ -280,13 +383,13 @@ async function loadFlow(name) {
   flowName = name;
   updateBreadcrumbs();
   updateTreeSelection();
-  const filename = `${name}.air.mmd`;
+  const filename = `${name}.mmd`;
   const url = new URL(`flows/${filename}`, location.href);
   byId('raw-link').href = url.href;
   byId('raw-link').hidden = false;
   byId('flow-title').replaceChildren(document.createTextNode(name));
   const extension = document.createElement('span');
-  extension.textContent = '.air.mmd';
+  extension.textContent = '.mmd';
   byId('flow-title').append(extension);
   byId('source-name').textContent = filename;
   byId('status').textContent = 'Loading workflow...';
@@ -298,6 +401,7 @@ async function loadFlow(name) {
     if (id !== requestId) return;
     if (!text.trim()) throw new Error(`${filename} is empty.`);
     source = text;
+    nodeContexts = parseNodeContexts(source);
     byId('source').textContent = source;
     byId('download').disabled = false;
     byId('copy').disabled = false;
@@ -316,6 +420,19 @@ async function loadFlow(name) {
 }
 
 diagram.addEventListener('click', followWorkflowLink);
+byId('close-node-context').addEventListener('click', () => byId('node-context-dialog').close());
+byId('node-context-dialog').addEventListener('click', (event) => {
+  if (event.target === byId('node-context-dialog')) byId('node-context-dialog').close();
+});
+byId('open-subflow').addEventListener('click', (event) => {
+  const link = event.currentTarget;
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  const href = link.href;
+  byId('node-context-dialog').close();
+  history.pushState(null, '', href);
+  loadFlow(new URL(href).searchParams.get('flow'));
+});
 byId('breadcrumbs').addEventListener('click', followWorkflowLink);
 byId('workflow-tree').addEventListener('click', followWorkflowLink);
 window.addEventListener('popstate', () => loadFlow(new URLSearchParams(location.search).get('flow') ?? 'project'));
@@ -365,7 +482,7 @@ byId('download').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([source], { type: 'text/plain;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${flowName}.air.mmd`;
+  link.download = `${flowName}.mmd`;
   document.body.append(link);
   link.click();
   link.remove();

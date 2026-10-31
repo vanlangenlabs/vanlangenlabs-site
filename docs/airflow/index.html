@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="AIRFlow: an online diagram viewer for AI software development workflows, with original Mermaid sources for AI agents and Copilot instructions.">
-  <title>AIRFlow Viewer | AI Workflow Diagrams</title>
+  <meta name="description" content="AIRFlow: an AI-assisted software development method documented with Mermaid diagrams, with original sources for AI agents and Copilot instructions.">
+  <title>AIRFlow | AI-Assisted Development Method</title>
   <link rel="stylesheet" href="css/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
   <script defer src="js/viewer.js"></script>
 </head>
 <body>
   <header class="header">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AIRFlow Viewer</h1><p>AI Routing Flow &middot; AI workflow diagrams</p></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AI<span class="brand-highlight">R</span>Flow Viewer</h1><p>AI Routing Flow &middot; AI-assisted development method</p></div></div>
     <div class="header-actions"><button id="get-started" type="button" class="get-started" aria-haspopup="dialog">Get started</button><label class="theme-switch"><input id="theme" type="checkbox" role="switch"><span>Dark theme</span></label></div>
   </header>
   <main class="viewer-layout">
@@ -26,10 +26,10 @@
     <div class="viewer-content">
     <section class="workspace" aria-label="Workflow viewer">
       <div class="toolbar">
-        <div class="file-actions"><a id="raw-link" href="flows/project.air.mmd" target="_blank" rel="noopener">Raw Mermaid source <span aria-hidden="true">&#8599;</span></a><button id="copy-ai" class="copy-ai" disabled>Copy AI reference</button><button id="download" class="download" disabled><span aria-hidden="true">&#8595;</span> Download</button></div>
+        <div class="file-actions"><a id="raw-link" href="flows/project.mmd" target="_blank" rel="noopener">Raw Mermaid source <span aria-hidden="true">&#8599;</span></a><button id="copy-ai" class="copy-ai" disabled>Copy AI reference</button><button id="download" class="download" disabled><span aria-hidden="true">&#8595;</span> Download</button></div>
       </div>
       <nav class="breadcrumbs" aria-label="Workflow hierarchy"><ol id="breadcrumbs"></ol><span class="viewer-mode">Read-only diagram</span></nav>
-      <div class="diagram-heading"><h2 id="flow-title">project<span>.air.mmd</span></h2><span id="status" role="status" aria-live="polite">Loading workflow...</span></div>
+      <div class="diagram-heading"><h2 id="flow-title">project<span>.mmd</span></h2><span id="status" role="status" aria-live="polite">Loading workflow...</span></div>
       <div id="viewport" class="viewport" tabindex="0" aria-label="Workflow diagram" aria-busy="true">
         <div id="diagram" class="diagram"></div>
         <div id="message" class="message" role="alert" hidden></div>
@@ -43,17 +43,27 @@
       </div>
     </section>
     <details class="source-panel" id="source-panel">
-      <summary>Mermaid source <span class="source-extension">Read-only &middot; .air.mmd</span></summary>
-      <div class="source-toolbar"><span id="source-name">project.air.mmd</span><button id="copy" type="button" disabled>Copy source</button></div>
+      <summary>Mermaid source <span class="source-extension">Read-only &middot; .mmd</span></summary>
+      <div class="source-toolbar"><span id="source-name">project.mmd</span><button id="copy" type="button" disabled>Copy source</button></div>
       <pre><code id="source"></code></pre>
     </details>
+    <dialog id="node-context-dialog" aria-labelledby="node-context-title">
+      <div class="dialog-content">
+        <header class="dialog-header">
+          <div><p class="context-eyebrow">Workflow context</p><h2 id="node-context-title"></h2></div>
+          <button id="close-node-context" type="button" class="close-dialog" aria-label="Close workflow context" title="Close" autofocus>&times;</button>
+        </header>
+        <article id="node-context-content" class="node-context-content"></article>
+        <a id="open-subflow" class="context-subflow" hidden>Open phase diagram <span aria-hidden="true">&#8599;</span></a>
+      </div>
+    </dialog>
     </div>
   </main>
   <dialog id="get-started-dialog" aria-labelledby="get-started-title">
     <div class="dialog-content">
-      <header class="dialog-header"><h2 id="get-started-title">AI workflow diagrams</h2><button id="close-get-started" type="button" class="close-dialog" aria-label="Close Get started" title="Close" autofocus>&times;</button></header>
+      <header class="dialog-header"><h2 id="get-started-title">AI-assisted development method</h2><button id="close-get-started" type="button" class="close-dialog" aria-label="Close Get started" title="Close" autofocus>&times;</button></header>
       <div class="ai-context">
-        <p>AIRFlow describes AI software development workflows as Mermaid diagrams. People view the diagram; AI agents read the original <code>.air.mmd</code> source. This is a read-only viewer, not an editor or an agent runner.</p>
+        <p>AIRFlow describes AI software development workflows as Mermaid diagrams. People view the diagram; AI agents read the original <code>.mmd</code> source. This is a read-only viewer, not an editor or an agent runner.</p>
         <h3>Use with AI / Copilot</h3>
         <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download standard Copilot instructions</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. The standard instructions already reference the shared Project workflow; no viewer setup is required.</p>
         <p>Copy AI reference uses the same standard instructions and adds the selected diagram as context. The agent must still enter through Project, not start independently at that diagram.</p>

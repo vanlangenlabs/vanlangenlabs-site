@@ -1,9 +1,0 @@
-flowchart TD
-    design[Design] --> designApproval{Design approved?}
-    designApproval -- No: revise design --> design
-    designApproval -- Yes --> designReady([Design agreed])
-
-    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
-    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
-    class designReady boundary
-    class designApproval approval

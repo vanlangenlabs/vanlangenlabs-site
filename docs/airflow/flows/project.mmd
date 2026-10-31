@@ -1,0 +1,25 @@
+flowchart TD
+    start([Start or resume project]) --> concept[["Concept: concept.mmd"]]
+%% @airflow-context concept
+%% Establish the product-level rationale once in `.air/concept.md`. On resume,
+%% use `.air/index.md` and skip this phase when the concept is already approved.
+%% Revisit it only when the user changes the product direction.
+%% @end-airflow-context
+
+    concept -- Project concept approved --> featureIntake[["Feature intake: feature-intake.mmd"]]
+    featureIntake -- Approved backlog ready --> releasePlanning[["Release planning: release-planning.mmd"]]
+    featureIntake -- No approved features: pause --> projectIdle([Project idle])
+    releasePlanning -- Release scope approved --> design[["Design: design.mmd"]]
+    releasePlanning -- Release planning deferred: return to backlog --> featureIntake
+    design -- Integrated release design approved --> implementation[["Implementation: implementation.mmd"]]
+    implementation -- Current scoped feature ready for verification --> verification[["Verification: verification.mmd"]]
+    verification -- Release verification passed --> releaseApproval{Human authorizes publication?}
+    releaseApproval -- No: wait for explicit authorization --> releaseBlocked([Release blocked])
+    releaseApproval -- Yes: publish approved version --> releasePublished([Release published])
+    releasePublished --> anotherRelease{Plan another release now?}
+    anotherRelease -- Yes: return to feature intake --> featureIntake
+    anotherRelease -- No: pause project --> projectIdle([Project idle])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    class start,releasePublished,projectIdle,releaseBlocked boundary
+    class releaseApproval,anotherRelease approval

@@ -1,0 +1,42 @@
+flowchart TD
+    start([Verify current scoped feature]) --> testing[Run required tests and review against Definition and release Design]
+    testing --> featureChecksPassed{Feature checks passed?}
+    featureChecksPassed -- No: diagnose findings --> diagnosis[Compare implementation and results with approved Design and acceptance criteria]
+    diagnosis --> rootCause{Root cause identified?}
+    rootCause -- Implementation defect or deviation --> implementation[["Implementation: implementation.mmd"]]
+    implementation -- Rework complete: return --> testing
+    rootCause -- Design gap or conflict --> design[["Design: design.mmd"]]
+    design -- Release Design revised and approved: return --> implementation
+    rootCause -- Unclear cause or external blocker --> blocked([Blocked: report findings and ask])
+    featureChecksPassed -- Yes: feature criteria pass --> moreUnverified{Any scoped feature remains unverified?}
+    moreUnverified -- Yes: select next unverified feature --> implementation
+    moreUnverified -- No: run release-level checks --> releaseChecks[Run integration tests and release acceptance checks]
+    releaseChecks --> releaseChecksPassed{Release checks pass?}
+    releaseChecksPassed -- No: diagnose integration findings --> releaseDiagnosis[Compare release failures with scope, design and feature evidence]
+    releaseDiagnosis --> releaseRootCause{Release root cause identified?}
+    releaseRootCause -- Feature implementation defect --> implementation
+    releaseRootCause -- Integrated design gap --> design
+    releaseRootCause -- Unclear cause or external blocker --> blocked
+    releaseChecksPassed -- Yes --> verificationComplete([Release verification complete])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
+    class start,verificationComplete,blocked boundary
+    class featureChecksPassed,rootCause,moreUnverified,releaseChecksPassed,releaseRootCause approval
+
+%% @airflow-context diagnosis
+%% ## Purpose
+%% Find why verification failed before choosing a rework route.
+
+%% Compare the implementation, test output and review findings with the
+%% approved design and acceptance criteria. Record concrete evidence and
+%% identify whether the cause is an implementation defect, a design gap, or
+%% still unclear.
+%% @end-airflow-context
+
+%% @airflow-context rootCause
+%% Route implementation defects or deviations back to Implementation.
+%% Route an incomplete or conflicting design to Design; its approval gate still
+%% applies before implementation resumes. If evidence is insufficient or the
+%% cause is external, stop at Blocked and report the evidence instead of guessing.
+%% @end-airflow-context

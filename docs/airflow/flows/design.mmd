@@ -1,0 +1,12 @@
+flowchart TD
+    start([Design approved release scope]) --> inspect[Read the project concept and selected feature definitions]
+    inspect --> integrate[Design the selected features as one coherent release]
+    integrate --> review[Check architecture, interfaces, dependencies, risks and acceptance coverage]
+    review --> designApproval{Integrated release design approved by user?}
+    designApproval -- No: revise and review again --> integrate
+    designApproval -- Yes: save release design --> designReady([Release design approved])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
+    class start,designReady boundary
+    class designApproval approval

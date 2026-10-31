@@ -4,9 +4,12 @@
     "flow": "project",
     "children": [
       { "title": "Concept", "flow": "concept" },
+      { "title": "Feature intake", "flow": "feature-intake" },
       { "title": "Definition", "flow": "definition" },
+      { "title": "Release planning", "flow": "release-planning" },
       { "title": "Design", "flow": "design" },
-      { "title": "Delivery", "flow": "delivery" }
+      { "title": "Implementation", "flow": "implementation" },
+      { "title": "Verification", "flow": "verification" }
     ]
   }
 ]

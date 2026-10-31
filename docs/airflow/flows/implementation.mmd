@@ -1,0 +1,13 @@
+flowchart TD
+    start([Select next feature in approved release scope]) --> plan[Derive tasks from its Definition and release Design]
+    plan --> implement[Implement the feature within the approved scope]
+    implement --> checks[Run focused checks and update `.air/index.md`]
+    checks --> complete{Feature tasks complete and focused checks pass?}
+    complete -- No: continue or fix --> implement
+    complete -- Yes: return to Project --> implementationComplete([Feature implementation complete])
+    complete -- Blocked or scope unclear: stop and report --> blocked([Blocked: ask user])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    class start,implementationComplete,blocked boundary
+    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
+    class complete approval

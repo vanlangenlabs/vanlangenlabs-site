@@ -1,7 +1,7 @@
 # AIRFlow
 
 AIRFlow (AI Routing Flow) describes AI-assisted software development workflows
-with Mermaid diagrams. Each `.air.mmd` file is the single source of truth for
+with Mermaid diagrams. Each `.mmd` file is the single source of truth for
 both the visual viewer and AI agents. The viewer fetches the original file at
 runtime; no workflow definitions are embedded in HTML or JavaScript.
 
@@ -28,7 +28,7 @@ in the tree. Direct `?flow=...` URLs still work for unlisted workflows.
 ## Navigation index
 
 `index.json` is an array of workflow entries. Each entry has a display `title`,
-a safe `flow` name without the `.air.mmd` extension, and optional `children`:
+a safe `flow` name without the `.mmd` extension, and optional `children`:
 
 ```json
 [
@@ -46,28 +46,48 @@ a safe `flow` name without the `.air.mmd` extension, and optional `children`:
 Nest `children` to add deeper levels, or add entries to the outer array for
 additional roots. Flow names must be unique across the tree and use the safe
 filename rules below. The index contains only navigation metadata, never Mermaid
-definitions. Each selected workflow is still fetched from `flows/<flow>.air.mmd`.
+definitions. Each selected workflow is still fetched from `flows/<flow>.mmd`.
 Changing the tree requires no HTML or JavaScript edits. A missing or invalid
 index shows a navigation error without preventing direct workflow URLs from loading.
 
 ## Separate workflows
 
-`flows/project.air.mmd` is the orchestrating entry point. Its subroutine nodes
+`flows/project.mmd` is the orchestrating entry point. Its subroutine nodes
 call separate files relative to that source URL; it does not duplicate their
 internal steps. Complete each subflow and its required approvals before returning
 to Project and following its next edge. The phases are not independently chosen.
+Concept is the product rationale and is approved once. Feature intake and
+Definition create separately approved feature records in the backlog. Release
+planning selects a set of feature IDs for a version; Design describes that set
+as one coherent release. Implementation and Verification then run per feature
+in the approved scope. Only after every scoped feature and the release-level
+checks pass, and the user authorizes publication, is the release published.
+Later releases return to Feature intake, not Concept. Verification diagnoses
+failures and routes them to Implementation, approved Design rework, or a blocker
+report rather than retrying blindly.
+
+The consuming project stores its AI-managed records under `.air/`, not in this
+AIRFlow method repository. The downloaded Copilot instructions initialize that
+workspace and define its README, index, feature and release records. Optional
+GitHub or GitLab tracking does not replace the `.air/` records.
+
 Each phase is an independent Mermaid diagram with its own approvals and loops:
 
 | Workflow | Viewer | Raw source |
 | --- | --- | --- |
-| Project overview | [project](index.html?flow=project) | [project.air.mmd](flows/project.air.mmd) |
-| Concept | [concept](index.html?flow=concept) | [concept.air.mmd](flows/concept.air.mmd) |
-| Definition | [definition](index.html?flow=definition) | [definition.air.mmd](flows/definition.air.mmd) |
-| Design | [design](index.html?flow=design) | [design.air.mmd](flows/design.air.mmd) |
-| Implementation, testing and release | [delivery](index.html?flow=delivery) | [delivery.air.mmd](flows/delivery.air.mmd) |
+| Project overview | [project](index.html?flow=project) | [project.mmd](flows/project.mmd) |
+| Concept | [concept](index.html?flow=concept) | [concept.mmd](flows/concept.mmd) |
+| Feature intake | [feature intake](index.html?flow=feature-intake) | [feature-intake.mmd](flows/feature-intake.mmd) |
+| Definition | [definition](index.html?flow=definition) | [definition.mmd](flows/definition.mmd) |
+| Release planning | [release planning](index.html?flow=release-planning) | [release-planning.mmd](flows/release-planning.mmd) |
+| Design | [design](index.html?flow=design) | [design.mmd](flows/design.mmd) |
+| Implementation | [implementation](index.html?flow=implementation) | [implementation.mmd](flows/implementation.mmd) |
+| Verification | [verification](index.html?flow=verification) | [verification.mmd](flows/verification.mmd) |
 
 The viewer renders only the selected file. It does not merge or automatically
-load referenced workflows. Click an underlined workflow node to open its diagram.
+load referenced workflows. Click a node with context to read its Markdown in a
+panel. If it references a subflow, use **Open phase diagram** in that panel;
+workflow nodes without context open their diagram directly.
 The breadcrumb trail above the diagram navigates back to ancestors. The trail
 is stored in the URL, so reloading, sharing and browser Back/Forward preserve it.
 Opening a listed workflow directly uses its ancestors from `index.json`; clicking
@@ -77,6 +97,26 @@ An agent can fetch the overview to discover the
 filenames, then resolve each filename relative to the overview's raw URL and
 fetch only the phase it needs.
 
+### Add node context
+
+Add Markdown context to a node using Mermaid comments in the same `.mmd` file.
+The text stays out of the graphic, appears in the viewer when its node is
+clicked, and remains available to agents reading the source:
+
+```mermaid
+%% @airflow-context concept
+%% ## Purpose
+%% Agree on the problem before defining a solution.
+
+%% **Outcome:** A concept approved by the user.
+%% @end-airflow-context
+```
+
+The context key must match the Mermaid node ID, not its visible label.
+Use an empty line between Markdown paragraphs. The viewer formats headings,
+paragraphs, bullet lists, bold text and inline code. Context explains a node but
+does not replace its diagram or subflow; agents should follow both.
+
 ### Link child workflows
 
 In a flowchart, use a node label containing a filename alone, or a description
@@ -84,7 +124,7 @@ followed by a colon and filename:
 
 ```mermaid
 flowchart LR
-   concept["Concept: concept.air.mmd"]
+   concept["Concept: concept.mmd"]
 ```
 
 The viewer turns that node into a keyboard-accessible link to `?flow=concept`.
@@ -107,16 +147,16 @@ selects the source for manual copying.
 
 ## Add a workflow
 
-1. Create a UTF-8 Mermaid file such as `flows/issue.air.mmd`.
+1. Create a UTF-8 Mermaid file such as `flows/issue.mmd`.
 2. Use valid Mermaid syntax, for example `flowchart TD`, followed by your nodes
-   and edges. See `flows/concept.air.mmd` for approvals and feedback loops.
+   and edges. See `flows/concept.mmd` for approvals and feedback loops.
 3. Add a `{"title": "Issue", "flow": "issue"}` entry to `index.json`, under the
    appropriate parent's `children` or as another root.
 4. Open it from the tree or navigate directly to `index.html?flow=issue`.
 
 Names must start with an ASCII letter or digit and contain only ASCII letters,
 digits, hyphens and underscores, up to 80 characters. Do not include an extension
-or path. The viewer always resolves `flows/<name>.air.mmd` relative to its page.
+or path. The viewer always resolves `flows/<name>.mmd` relative to its page.
 Path separators, dots and traversal sequences are rejected before fetching.
 
 Edit the Mermaid file to change the diagram; no viewer changes or build step are
@@ -129,12 +169,14 @@ An agent can fetch the original plain-text Mermaid source without loading the
 viewer or executing JavaScript:
 
 ```text
-https://<domain>/airflow/flows/project.air.mmd
-https://<domain>/airflow/flows/concept.air.mmd
-https://<domain>/airflow/flows/definition.air.mmd
-https://<domain>/airflow/flows/design.air.mmd
-https://<domain>/airflow/flows/delivery.air.mmd
-https://<owner>.github.io/<repository>/airflow/flows/project.air.mmd
+https://<domain>/airflow/flows/project.mmd
+https://<domain>/airflow/flows/concept.mmd
+https://<domain>/airflow/flows/feature-intake.mmd
+https://<domain>/airflow/flows/definition.mmd
+https://<domain>/airflow/flows/release-planning.mmd
+https://<domain>/airflow/flows/design.mmd
+https://<domain>/airflow/flows/verification.mmd
+https://<owner>.github.io/<repository>/airflow/flows/project.mmd
 ```
 
 For example, provide that URL as development context and ask the agent to follow
@@ -148,14 +190,18 @@ Use the viewer URL for people and the raw Mermaid URL for agents:
 | Audience | URL |
 | --- | --- |
 | Human diagram viewer | `https://vanlangen.org/airflow/?flow=project` |
-| AI workflow source | `https://vanlangen.org/airflow/flows/project.air.mmd` |
+| AI workflow source | `https://vanlangen.org/airflow/flows/project.mmd` |
 
 ### Quick setup
 
 1. Download [the standard copilot-instructions.md](copilot-instructions.md).
 2. Place it at `.github/copilot-instructions.md` in your consuming repository.
    If that file already exists, merge the instructions instead of replacing it.
-3. Commit it with your project and use Copilot with repository instructions enabled.
+3. On the first AIRFlow-assisted project run, the agent initializes the
+   project-local `.air/` workspace and its README/index as described in those
+   instructions. AIRFlow's own `docs/airflow/` remains the method reference.
+4. Commit the instructions with your project and use Copilot with repository
+   instructions enabled.
 
 The file is ready to use: it references the shared Project source and defines
 subflow calls, return conditions, human approvals and resuming work. It is a
@@ -190,7 +236,7 @@ The Pages URL follows the latest published version. For reproducible shared
 workflows, pin a Git commit or release tag using a raw repository URL, for example:
 
 ```text
-https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/<commit-or-tag>/docs/airflow/flows/project.air.mmd
+https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/<commit-or-tag>/docs/airflow/flows/project.mmd
 ```
 
 Replace `<commit-or-tag>` with a real commit SHA or tag. Relative phase references
@@ -203,41 +249,24 @@ The viewer does not route agents automatically. Mermaid defines the process;
 `index.json` describes navigation, not project progress. An agent needs both
 the workflow definition and the consuming project's current state:
 
-1. Always read Project (`project.air.mmd`), even when resuming work or viewing a child.
+1. Always read Project (`project.mmd`), even when resuming work or viewing a child.
 2. Follow its first pending node in order. A node referencing another Mermaid
    file calls that subflow; resolve the filename relative to the caller's source.
 3. Read and follow the subflow, including its loops and human approval gates.
    For nested calls, retain the calling step and apply the same rule recursively.
 4. Return only after reaching the subflow's successful terminal node and satisfying
    required approvals and checks. Project then determines the next phase.
-5. On resume, use recorded state and evidence to restore the call context, not to
-   independently choose a phase or bypass required steps. Ask when evidence or
-   approval is unclear; report inaccessible sources instead of guessing.
+5. On resume, read `.air/index.md` and its referenced records to restore the
+   active project, feature or release context. Do not independently choose a
+   phase or bypass required steps. Ask when state, evidence or approval is unclear.
 
-A consuming repository can keep a small version-controlled state record, for
-example `docs/ai-workflow-state.json` (a suggested convention, not a file the
-viewer loads):
-
-```json
-{
-   "entry": "https://vanlangen.org/airflow/flows/project.air.mmd",
-  "phase": "design",
-  "workflow": "https://vanlangen.org/airflow/flows/design.air.mmd",
-   "callingStep": "project/design",
-   "currentStep": "designApproval",
-  "approvals": {
-    "concept": "approved",
-    "definition": "approved",
-    "design": "pending"
-  },
-  "artifacts": ["docs/concept.md", "docs/requirements.md"]
-}
-```
-
-Tell the agent where that state record lives in the repository instructions.
-Use the branch or task's own state when work runs in parallel. Record approvals
-with the human reviewer and supporting evidence; the agent must not grant itself
-approval. No workflow state is created or updated automatically by AIRFlow.
+The consuming repository's `.air/index.md` is the inventory and status register
+for its AI-managed project records. It tracks the active phase, feature and
+release, record paths, external tracker references and approval evidence. Keep
+the detailed definitions, release scope and design in their individual Markdown
+files under `.air/`; do not maintain a second state file under `docs/`.
+Record approvals with the human reviewer and evidence. The AI must not grant
+itself approval.
 
 ### Project-specific workflows in your repository
 
@@ -248,7 +277,7 @@ For example, store the overview and its phase files together in
 ```markdown
 ## AI development workflow
 
-Before development work, read docs/ai-workflows/project.air.mmd from this repository.
+Before development work, read docs/ai-workflows/project.mmd from this repository.
 Project is the orchestrator. Follow its nodes in order, reading referenced subflows
 from the caller's directory. Complete each subflow, including its feedback loops,
 checks and human approvals, before returning to Project for the next step.

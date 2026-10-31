@@ -1,0 +1,10 @@
+flowchart TD
+    start([Define product purpose]) --> concept[Describe the problem, users and desired outcome]
+    concept --> conceptApproval{Product concept approved?}
+    conceptApproval -- No: refine the problem or outcome --> concept
+    conceptApproval -- Yes: save `.air/concept.md` --> conceptReady([Project concept established])
+
+    classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
+    classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
+    class start,conceptReady boundary
+    class conceptApproval approval
