@@ -1,9 +1,19 @@
 flowchart TD
     start([Feature proposed]) --> capture[Capture request from conversation or configured tracker]
+%% @airflow-context capture
+%% Accept a feature proposal from the conversation or the configured GitHub/GitLab
+%% tracker. The tracker is optional. Do not start implementation or select a
+%% release during intake.
+%% @end-airflow-context
     capture --> clarify[Clarify problem, users, outcome, scope and non-goals]
+%% @airflow-context clarify
+%% Ask only for information needed to write a useful Definition: affected users,
+%% problem, expected outcome/value, scope and non-goals. Do not infer missing
+%% requirements. Keep this proposal under one stable feature ID in `.air/`.
+%% @end-airflow-context
     clarify --> ready{Enough information to prepare a Definition draft?}
     ready -- No: ask and refine --> clarify
-    ready -- Yes: create or update draft --> draft[Draft feature Definition in `.air/features/feature-id/definition.md`]
+    ready -- Yes: create or update draft --> draft[Draft feature Definition in `.air/features/F-0001/definition.md`]
     draft --> definition[["Definition: definition.mmd"]]
     definition -- Approved: add to `.air/index.md` backlog --> backlog[Feature in approved backlog]
     definition -- Deferred: update `.air/index.md` --> deferred[Feature deferred]

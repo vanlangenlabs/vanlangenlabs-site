@@ -1,12 +1,28 @@
 flowchart TD
     start([Design approved release scope]) --> inspect[Read the project concept and selected feature definitions]
+%% @airflow-context inspect
+%% Load the approved concept, the exact approved scope, and only the feature
+%% Definitions listed there. Do not design backlog items outside the scope.
+%% @end-airflow-context
     inspect --> integrate[Design the selected features as one coherent release]
+%% @airflow-context integrate
+%% Design how the selected features work together as one version: shared
+%% components, interfaces, dependencies, data flows, risks, rollout and test
+%% approach. Trace every feature acceptance criterion to the integrated Design.
+%% @end-airflow-context
     integrate --> review[Check architecture, interfaces, dependencies, risks and acceptance coverage]
     review --> designApproval{Integrated release design approved by user?}
     designApproval -- No: revise and review again --> integrate
     designApproval -- Yes: save release design --> designReady([Release design approved])
+%% @airflow-context designApproval
+%% The human approves the integrated Design against the current scope digest.
+%% Bind approval to the exact Design digest and record evidence in `.air/index.md`.
+%% Material scope/design changes invalidate affected approvals per the contract.
+%% @end-airflow-context
+    designApproval -- Defer release --> designDeferred([Release deferred])
+    designApproval -- Cancel release --> designCancelled([Release cancelled])
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
-    class start,designReady boundary
+    class start,designReady,designDeferred,designCancelled boundary
     class designApproval approval

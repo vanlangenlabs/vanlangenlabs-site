@@ -1,11 +1,22 @@
 flowchart TD
     start([Define one feature]) --> clarify[Clarify problem, users and expected value]
     clarify --> specify[Specify behavior, acceptance criteria, scope, non-goals and dependencies]
+%% @airflow-context specify
+%% Write one independently deliverable feature Definition using the canonical
+%% template in the record contract. Make acceptance criteria observable and
+%% testable; record dependencies, constraints, non-goals and unresolved questions.
+%% @end-airflow-context
     specify --> definitionApproval{Feature definition approved by user?}
     definitionApproval -- No: ask questions or revise --> clarify
     definitionApproval -- Yes: save feature definition --> definitionReady([Feature added to backlog])
     definitionApproval -- Defer --> deferred([Deferred: keep out of release scope])
     definitionApproval -- Reject --> rejected([Rejected: record decision in `.air/index.md`])
+%% @airflow-context definitionApproval
+%% Only an explicit user decision moves a feature into the approved backlog. Bind
+%% approval to the exact Definition digest and record its evidence in `.air/index.md`
+%% using the contract's Approval evidence section. Defer/reject decisions are
+%% recorded but never included in a release scope.
+%% @end-airflow-context
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162

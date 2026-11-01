@@ -176,12 +176,18 @@ https://<domain>/airflow/flows/definition.mmd
 https://<domain>/airflow/flows/release-planning.mmd
 https://<domain>/airflow/flows/design.mmd
 https://<domain>/airflow/flows/verification.mmd
+https://<domain>/airflow/record-lifecycle.md
 https://<owner>.github.io/<repository>/airflow/flows/project.mmd
 ```
 
 For example, provide that URL as development context and ask the agent to follow
 its stages, approval decisions and feedback loops. The URL serves the original
 file, not generated JSON or an HTML copy.
+
+The shared [project record contract](record-lifecycle.md) is detailed reference for
+status transitions, approval evidence, resume, changes and conflicts. It is not a
+default per-prompt read; agents consult only the relevant section when the active
+phase requires it.
 
 ## Use with AI and Copilot
 
@@ -203,8 +209,7 @@ Use the viewer URL for people and the raw Mermaid URL for agents:
 4. Commit the instructions with your project and use Copilot with repository
    instructions enabled.
 
-The file is ready to use: it references the shared Project source and defines
-subflow calls, return conditions, human approvals and resuming work. It is a
+The file references the shared Project workflow and record contract. It is a
 downloadable template, not an active instruction file for this website repository.
 No changes to the viewer or navigation index are needed for consumers.
 
@@ -246,27 +251,24 @@ automatically.
 ### Project orchestrates subflows
 
 The viewer does not route agents automatically. Mermaid defines the process;
-`index.json` describes navigation, not project progress. An agent needs both
-the workflow definition and the consuming project's current state:
+`index.json` describes navigation, not project progress. Start with Project and
+the active subflow, then read only relevant `.air/` records:
 
-1. Always read Project (`project.mmd`), even when resuming work or viewing a child.
+1. Read Project (`project.mmd`), even when resuming or viewing a child.
 2. Follow its first pending node in order. A node referencing another Mermaid
    file calls that subflow; resolve the filename relative to the caller's source.
 3. Read and follow the subflow, including its loops and human approval gates.
    For nested calls, retain the calling step and apply the same rule recursively.
 4. Return only after reaching the subflow's successful terminal node and satisfying
    required approvals and checks. Project then determines the next phase.
-5. On resume, read `.air/index.md` and its referenced records to restore the
-   active project, feature or release context. Do not independently choose a
-   phase or bypass required steps. Ask when state, evidence or approval is unclear.
+5. On resume, inspect only the active `.air/index.md` entries and referenced
+   records. Consult the relevant `record-lifecycle.md` section only for a mismatch,
+   approval, change-impact or conflict question; block on unresolved inconsistencies.
 
 The consuming repository's `.air/index.md` is the inventory and status register
-for its AI-managed project records. It tracks the active phase, feature and
-release, record paths, external tracker references and approval evidence. Keep
-the detailed definitions, release scope and design in their individual Markdown
-files under `.air/`; do not maintain a second state file under `docs/`.
-Record approvals with the human reviewer and evidence. The AI must not grant
-itself approval.
+for its AI-managed records. The canonical schema, approvals and resume rules are
+in `record-lifecycle.md`; detailed definitions, scope and design stay in their
+individual `.air/` Markdown files.
 
 ### Project-specific workflows in your repository
 

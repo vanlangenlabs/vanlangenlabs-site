@@ -1,25 +1,48 @@
 flowchart TD
     start([Start or resume project]) --> concept[["Concept: concept.mmd"]]
 %% @airflow-context concept
-%% Establish the product-level rationale once in `.air/concept.md`. On resume,
-%% use `.air/index.md` and skip this phase when the concept is already approved.
-%% Revisit it only when the user changes the product direction.
+%% Establish the product rationale once. A new feature or release does not repeat
+%% Concept; revisit only after an approved product-direction change.
 %% @end-airflow-context
 
     concept -- Project concept approved --> featureIntake[["Feature intake: feature-intake.mmd"]]
+%% @airflow-context featureIntake
+%% Proposals enter here. Definition determines whether each feature is approved
+%% for the backlog. Do not define implementation work or pick a release here.
+%% @end-airflow-context
     featureIntake -- Approved backlog ready --> releasePlanning[["Release planning: release-planning.mmd"]]
     featureIntake -- No approved features: pause --> projectIdle([Project idle])
     releasePlanning -- Release scope approved --> design[["Design: design.mmd"]]
+%% @airflow-context releasePlanning
+%% The human chooses the exact approved feature IDs for a version. Design covers
+%% that complete approved set. Deferred planning returns to intake/backlog.
+%% @end-airflow-context
     releasePlanning -- Release planning deferred: return to backlog --> featureIntake
+    releasePlanning -- Release cancelled --> projectIdle
     design -- Integrated release design approved --> implementation[["Implementation: implementation.mmd"]]
+%% @airflow-context implementation
+%% Implementation is autonomous only within the approved release scope and
+%% release Design; verification controls return the flow for rework.
+%% @end-airflow-context
+    design -- Release deferred or cancelled --> projectIdle
     implementation -- Current scoped feature ready for verification --> verification[["Verification: verification.mmd"]]
     verification -- Release verification passed --> releaseApproval{Human authorizes publication?}
-    releaseApproval -- No: wait for explicit authorization --> releaseBlocked([Release blocked])
+%% @airflow-context releaseApproval
+%% This gate applies to the whole release, not an individual feature. Require
+%% current approval evidence for the exact release scope and Design, passing
+%% release checks, and explicit human publication authorization.
+%% @end-airflow-context
+    verification -- Release deferred or cancelled --> projectIdle
+    releaseApproval -- No: wait for explicit authorization --> awaitingPublication([Awaiting publication authorization])
     releaseApproval -- Yes: publish approved version --> releasePublished([Release published])
+    awaitingPublication -- Human explicitly authorizes publication --> releasePublished
+    awaitingPublication -- User requests additional checks --> verification
+    awaitingPublication -- Human cancels this release --> projectIdle
     releasePublished --> anotherRelease{Plan another release now?}
     anotherRelease -- Yes: return to feature intake --> featureIntake
     anotherRelease -- No: pause project --> projectIdle([Project idle])
+    projectIdle -- User requests new feature or release --> featureIntake
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
-    class start,releasePublished,projectIdle,releaseBlocked boundary
+    class start,releasePublished,projectIdle,awaitingPublication boundary
     class releaseApproval,anotherRelease approval

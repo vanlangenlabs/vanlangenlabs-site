@@ -1,12 +1,37 @@
 flowchart TD
     start([Verify current scoped feature]) --> testing[Run required tests and review against Definition and release Design]
+%% @airflow-context testing
+%% Verify only against the current approved Definition digest and release Design
+%% digest. Record check names, results and evidence in `.air/index.md`. Feature
+%% checks do not substitute for the release-level integration checks below.
+%% @end-airflow-context
     testing --> featureChecksPassed{Feature checks passed?}
     featureChecksPassed -- No: diagnose findings --> diagnosis[Compare implementation and results with approved Design and acceptance criteria]
+%% @airflow-context diagnosis
+%% Compare concrete test/review evidence against the current approved Definition
+%% and Design. Route an implementation defect to Implementation; a material
+%% Definition change to Definition and impact analysis; a Design gap to Design.
+%% If cause or impact is unclear, stop and report evidence rather than guessing.
+%% @end-airflow-context
     diagnosis --> rootCause{Root cause identified?}
     rootCause -- Implementation defect or deviation --> implementation[["Implementation: implementation.mmd"]]
     implementation -- Rework complete: return --> testing
-    rootCause -- Design gap or conflict --> design[["Design: design.mmd"]]
+    rootCause -- Feature Definition changed --> definition[["Definition: definition.mmd"]]
+    definition -- Revised and approved --> impact[Assess affected release artifacts]
+    definition -- Deferred or rejected: re-scope release --> releasePlanning[["Release planning: release-planning.mmd"]]
+    impact --> scopeImpact{Scope feature set or release goals changed?}
+    scopeImpact -- Yes: reapprove scope --> releasePlanning[["Release planning: release-planning.mmd"]]
+    releasePlanning -- Scope reapproved --> designForChangedDefinition[["Design: design.mmd"]]
+    releasePlanning -- Release planning deferred --> releaseDeferred([Release deferred])
+    releasePlanning -- Release cancelled --> releaseCancelled([Release cancelled])
+    scopeImpact -- No --> designImpact{Integrated Design or acceptance mapping changed?}
+    designImpact -- Yes: reapprove Design --> design[["Design: design.mmd"]]
+    designImpact -- No: no upstream impact --> implementation
+    designForChangedDefinition -- Integrated Design approved --> implementation
     design -- Release Design revised and approved: return --> implementation
+    design -- Release deferred --> releaseDeferred
+    design -- Release cancelled --> releaseCancelled
+    rootCause -- Design gap or conflict --> design
     rootCause -- Unclear cause or external blocker --> blocked([Blocked: report findings and ask])
     featureChecksPassed -- Yes: feature criteria pass --> moreUnverified{Any scoped feature remains unverified?}
     moreUnverified -- Yes: select next unverified feature --> implementation
@@ -18,24 +43,22 @@ flowchart TD
     releaseRootCause -- Integrated design gap --> design
     releaseRootCause -- Unclear cause or external blocker --> blocked
     releaseChecksPassed -- Yes --> verificationComplete([Release verification complete])
+%% @airflow-context releaseChecks
+%% Run release integration and project acceptance checks only after every feature
+%% in the approved scope is verified. Record results against current scope/Design
+%% digests. A failure goes through release diagnosis; passing checks do not
+%% authorize publication, which remains a human decision in Project.
+%% @end-airflow-context
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
-    class start,verificationComplete,blocked boundary
+    class start,verificationComplete,blocked,releaseDeferred,releaseCancelled boundary
     class featureChecksPassed,rootCause,moreUnverified,releaseChecksPassed,releaseRootCause approval
-
-%% @airflow-context diagnosis
-%% ## Purpose
-%% Find why verification failed before choosing a rework route.
-
-%% Compare the implementation, test output and review findings with the
-%% approved design and acceptance criteria. Record concrete evidence and
-%% identify whether the cause is an implementation defect, a design gap, or
-%% still unclear.
-%% @end-airflow-context
 
 %% @airflow-context rootCause
 %% Route implementation defects or deviations back to Implementation.
+%% If the approved feature Definition has materially changed, return through
+%% Definition, then reapprove the affected release scope and integrated Design.
 %% Route an incomplete or conflicting design to Design; its approval gate still
 %% applies before implementation resumes. If evidence is insufficient or the
 %% cause is external, stop at Blocked and report the evidence instead of guessing.

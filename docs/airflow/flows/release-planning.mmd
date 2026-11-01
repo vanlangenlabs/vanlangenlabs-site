@@ -1,13 +1,25 @@
 flowchart TD
     start([Plan a release]) --> readBacklog[Read approved feature definitions and project concept]
+%% @airflow-context readBacklog
+%% Read only the approved backlog records relevant to release planning. Propose
+%% a coherent set based on project goals, dependencies, priority and capacity;
+%% do not treat issue order or tracker status alone as user approval.
+%% @end-airflow-context
     readBacklog --> propose[Propose a coherent feature set for a version]
     propose --> scopeApproval{User approves release scope?}
     scopeApproval -- No: revise proposed scope --> propose
     scopeApproval -- Defer release planning --> planningDeferred([Release planning deferred])
-    scopeApproval -- Yes: record version and feature IDs --> scope[Write release scope in `.air/releases/version/scope.md`]
+    scopeApproval -- Cancel release --> releaseCancelled([Release cancelled])
+    scopeApproval -- Yes: record version and feature IDs --> scope[Write release scope in `.air/releases/1.2.0/scope.md`]
     scope --> scopeReady([Release scope approved])
+%% @airflow-context scopeApproval
+%% The human approves the exact version, included feature IDs, exclusions and
+%% release goals. Bind the decision to the scope file digest. A changed set needs
+%% a new scope approval; deferred planning leaves features in the backlog.
+%% Record approval evidence in `.air/index.md` using the contract.
+%% @end-airflow-context
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
-    class start,scopeReady,planningDeferred boundary
+    class start,scopeReady,planningDeferred,releaseCancelled boundary
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
     class scopeApproval approval

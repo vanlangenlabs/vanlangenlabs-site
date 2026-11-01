@@ -1,6 +1,16 @@
 flowchart TD
     start([Select next feature in approved release scope]) --> plan[Derive tasks from its Definition and release Design]
+%% @airflow-context plan
+%% Use only the active feature's approved Definition and the currently approved
+%% release Design. Record the active feature/node and next action in `.air/index.md`;
+%% create external tasks only when a tracker is configured and authorized.
+%% @end-airflow-context
     plan --> implement[Implement the feature within the approved scope]
+%% @airflow-context implement
+%% Work autonomously on routine implementation decisions within approved scope.
+%% Do not pause for routine coding choices. Pause for unclear/conflicting
+%% requirements, blockers, scope changes or unauthorized side effects.
+%% @end-airflow-context
     implement --> checks[Run focused checks and update `.air/index.md`]
     checks --> complete{Feature tasks complete and focused checks pass?}
     complete -- No: continue or fix --> implement

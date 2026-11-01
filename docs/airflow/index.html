@@ -68,9 +68,11 @@
         <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download standard Copilot instructions</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. The standard instructions already reference the shared Project workflow; no viewer setup is required.</p>
         <p>Copy AI reference uses the same standard instructions and adds the selected diagram as context. The agent must still enter through Project, not start independently at that diagram.</p>
         <a id="ai-source-link" hidden></a>
+        <h3>Project records and resuming</h3>
+        <p>In the consuming repository, AIRFlow-managed project records live in <code>.air/</code>; <code>.air/index.md</code> tracks inventory, status and resume state. Phase-specific criteria are in the active Mermaid subflow. The <a href="record-lifecycle.md">project record contract</a> is detailed reference for approvals, changes and conflicts; consult only the relevant part when needed.</p>
         <h3>Project calls the subflows</h3>
-        <p>Always read Project first and follow its sequence. A referenced Mermaid file is a subflow call: retrieve it, follow its steps and feedback loops, then return to Project only after successful completion and the required human approval. Project then determines the next phase; the agent does not freely choose one.</p>
-        <p>The diagram defines the process, not the current project state. Record the active phase, approvals and relevant artifacts in the consuming repository so an agent can determine where to continue.</p>
+        <p>Read Project, then follow its sequence and retrieve only the active Mermaid subflow. Follow that phase's embedded criteria and feedback loops; return to Project only after its successful terminal state and required approval. Project determines the next phase.</p>
+        <p>The diagram defines the process, not current project state. Read only the relevant entries in the consuming repository's <code>.air/index.md</code> to restore phase, call stack, artifacts, checks and approval evidence.</p>
         <p>For project-specific workflows, keep the Mermaid files in your repo and reference their local paths. For shared remote workflows, pin a release or commit for reproducible instructions. Web access depends on the AI agent's tools and permissions.</p>
       </div>
       <div class="reference-heading"><h3>AI instruction fragment</h3><button id="copy-ai-dialog" class="copy-ai" type="button" disabled>Copy AI reference</button></div>
