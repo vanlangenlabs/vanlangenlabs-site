@@ -1,9 +1,14 @@
 flowchart TD
-    start([Plan a release]) --> readBacklog[Read approved feature definitions and project concept]
+    start([Plan a release]) --> readBacklog[Read concept, current release scope and relevant feature definitions]
 %% @airflow-context readBacklog
-%% Read only the approved backlog records relevant to release planning. Propose
-%% a coherent set based on project goals, dependencies, priority and capacity;
-%% do not treat issue order or tracker status alone as user approval.
+%% For a new release, read relevant approved backlog Definitions and the concept.
+%% For replanning, also load the current scope, all its feature Definitions/statuses,
+%% change findings and current evidence, including selected/implementing/verifying/
+%% verified features. Existing membership is not lost because a feature left backlog.
+%% Propose retained, added and removed IDs explicitly; unresolved or unapproved
+%% Definitions cannot enter the approved scope. Preserve unaffected evidence with
+%% impact rationale. Use goals, dependencies, priority and capacity, never tracker
+%% order/status as approval. Do not select a feature belonging to another release.
 %% @end-airflow-context
     readBacklog --> propose[Propose a coherent feature set for a version]
     propose --> draft[Save proposed scope draft for exact-version review]
@@ -16,7 +21,8 @@ flowchart TD
 %% @airflow-context scopeApproval
 %% The human approves the exact version, included feature IDs, exclusions and
 %% release goals. Bind the decision to the scope file digest. A changed set needs
-%% a new scope approval; deferred planning leaves features in the backlog.
+%% a new scope approval. Deferring new planning leaves backlog unchanged;
+%% deferring an existing release preserves its membership and valid evidence.
 %% Record approval evidence in `.air/index.md` using the global instructions.
 %%
 %% Feature transitions owned by this phase:

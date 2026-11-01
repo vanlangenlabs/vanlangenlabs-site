@@ -341,6 +341,27 @@ function renderSource(id) {
   return renderQueue;
 }
 
+// One shared reference body; each agent gets its recognized filename.
+const agentSetups = {
+  copilot: { name: 'Copilot', filename: 'copilot-instructions.md', path: '.github/copilot-instructions.md' },
+  codex: { name: 'Codex', filename: 'AGENTS.md', path: 'AGENTS.md' },
+  claude: { name: 'Claude Code', filename: 'CLAUDE.md', path: 'CLAUDE.md' }
+};
+function updateAgentSetup() {
+  const setup = agentSetups[byId('agent-select').value] ?? agentSetups.copilot;
+  const download = byId('agent-download');
+  download.download = setup.filename;
+  download.textContent = `Download the ${setup.name} reference`;
+  const path = document.createElement('code');
+  path.textContent = setup.path;
+  byId('agent-placement').replaceChildren(
+    document.createTextNode('Save it as '), path,
+    document.createTextNode(setup.path.startsWith('.github/') ? ' in your repository.' : ' in the root of your repository.')
+  );
+}
+byId('agent-select').addEventListener('change', updateAgentSetup);
+updateAgentSetup();
+
 async function loadInstructions() {
   try {
     const response = await fetch(new URL('copilot-instructions.md', location.href), { cache: 'no-cache' });
@@ -350,7 +371,7 @@ async function loadInstructions() {
     instructionTemplate = text;
     byId('instructions-status').hidden = true;
   } catch (error) {
-    byId('instructions-status').textContent = `Could not load the Copilot reference. ${error.message}`;
+    byId('instructions-status').textContent = `Could not load the AIRFlow reference. ${error.message}`;
   }
 }
 
@@ -369,7 +390,6 @@ async function loadFlow(name) {
   aiCopyButtons.forEach((button) => { button.disabled = true; button.textContent = 'Copy AI reference'; });
   byId('ai-reference').textContent = '';
   byId('ai-copy-status').textContent = '';
-  byId('ai-source-link').hidden = true;
   zoomButtons.forEach((button) => { button.disabled = true; });
   byId('raw-link').hidden = true;
   viewport.setAttribute('aria-busy', 'true');
@@ -405,9 +425,6 @@ async function loadFlow(name) {
     byId('source').textContent = source;
     byId('download').disabled = false;
     byId('copy').disabled = false;
-    byId('ai-source-link').href = url.href;
-    byId('ai-source-link').textContent = url.href;
-    byId('ai-source-link').hidden = false;
     if (instructionTemplate) {
       byId('ai-reference').textContent = `${instructionTemplate.trimEnd()}\n\n## Selected Diagram (Context Only)\n\n${url.href}\n\nRead airflow.md first and enter through its Project link; this selected diagram is context only and must not override the configured source version.\n`;
       aiCopyButtons.forEach((button) => { button.disabled = false; });
@@ -535,13 +552,24 @@ gettingStarted.addEventListener('click', (event) => {
   if (event.target === gettingStarted) gettingStarted.close();
 });
 
-let hasSeenGettingStarted = false;
-try {
-  hasSeenGettingStarted = localStorage.getItem('airflow-get-started-seen') === 'true';
-} catch {}
-if (!hasSeenGettingStarted) {
+const welcome = byId('welcome-dialog');
+const welcomeSeenKey = 'airflow-welcome-seen';
+function dismissWelcome() { welcome.close(); }
+byId('close-welcome').addEventListener('click', dismissWelcome);
+byId('welcome-explore').addEventListener('click', dismissWelcome);
+byId('welcome-setup').addEventListener('click', () => {
+  welcome.close();
   gettingStarted.showModal();
-  try { localStorage.setItem('airflow-get-started-seen', 'true'); } catch {}
+});
+welcome.addEventListener('click', (event) => {
+  if (event.target === welcome) welcome.close();
+});
+// Native dialog Escape handling closes the introduction as well.
+let hasSeenWelcome = false;
+try { hasSeenWelcome = localStorage.getItem(welcomeSeenKey) === 'true'; } catch {}
+if (!hasSeenWelcome) {
+  welcome.showModal();
+  try { localStorage.setItem(welcomeSeenKey, 'true'); } catch {}
 }
 
 Promise.all([loadNavigation(), loadInstructions()]).then(() => loadFlow(new URLSearchParams(location.search).get('flow') ?? 'project'));

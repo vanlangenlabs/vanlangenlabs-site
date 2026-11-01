@@ -69,6 +69,11 @@ flowchart TD
     work -- Feature verification needed --> verification[["Verification: verification.mmd"]]
     work -- All scoped features verified: release mode --> verification
 %% @airflow-context select
+%% On entry after Design approval, transition release design-approved -> implementing
+%% once current Definition/scope/Design approvals are valid. This status covers
+%% feature implementation, reuse assessment and feature verification, even when
+%% no code changes are needed. The AI records the transition from evidence here,
+%% not inside Implementation. Release Verification alone moves implementing -> verifying.
 %% Apply the responsible phase transition rules before selecting work.
 %% Use current evidence and dependency ordering; preserve unaffected feature work.
 %% Pass feature ID, new-work/rework mode and findings to Implementation. Pass

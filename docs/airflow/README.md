@@ -1,5 +1,7 @@
 # AIRFlow
 
+Status: beta. Review agent output and report unclear workflow steps or unexpected behavior.
+
 AIRFlow (AI Routing Flow) describes AI-assisted software development workflows
 with Mermaid diagrams. The shared rules live in `airflow.md`; each `.mmd` file defines a phase for
 both the visual viewer and AI agents. The viewer fetches the original file at
@@ -188,7 +190,7 @@ Global storage, approval and resume rules are in [airflow.md](airflow.md).
 Phase-specific record outlines and transitions are embedded in Mermaid context.
 The instructions and flows define the full method.
 
-## Use with AI and Copilot
+## Use with Copilot, Codex and Claude Code
 
 Use the viewer URL for people and the method entry for agents:
 
@@ -199,21 +201,41 @@ Use the viewer URL for people and the method entry for agents:
 
 ### Quick setup
 
-1. Download [the standard copilot-instructions.md](copilot-instructions.md).
-2. Place it at `.github/copilot-instructions.md` in your consuming repository.
-   If that file already exists, merge the instructions instead of replacing it.
-3. On the first AIRFlow-assisted project run, the agent initializes the
-   project-local `.air/` workspace and its README/index as described in `airflow.md`.
-   AIRFlow's own `docs/airflow/` remains the method reference.
-4. Commit the instructions with your project and use Copilot with repository
-   instructions enabled.
+1. Open **Get started** and choose GitHub Copilot, OpenAI Codex or Claude Code.
+2. Download the reference and place it at the location shown below. If that file
+   exists, append the reference without replacing your existing instructions.
+3. Ask your agent to use AIRFlow for a development task. It reads online
+   `airflow.md`, then Project and the required subflows. It needs tools and
+   permission to retrieve these sources.
+
+| Agent | Download filename | Location in consuming repository |
+| --- | --- | --- |
+| GitHub Copilot | `copilot-instructions.md` | `.github/copilot-instructions.md` |
+| OpenAI Codex | `AGENTS.md` | Repository root |
+| Claude Code | `CLAUDE.md` | Repository root |
+
+All downloads use the same short content from `copilot-instructions.md`; the
+selector changes the browser download filename and placement instructions.
+There are no separate copies of the method or agent-specific workflow rules.
+If your browser opens the reference instead of downloading it, save or copy its
+contents into the filename shown for your agent.
+
+The agent initializes `.air/` from `airflow.md` in the consuming repository.
+The viewer, README and navigation index are not required agent inputs.
 
 The small downloaded file references `airflow.md`, which contains the shared rules
 and links to `flows/project.mmd` relative to its own source. It is a
 downloadable template, not an active instruction file for this website repository.
 No changes to the viewer or navigation index are needed for consumers.
 
-Open **Get started**, next to the theme switch, for the download and explanation.
+New visitors see a brief introduction explaining the method and its audience,
+with actions to explore the diagrams or open setup. It is shown once per browser
+profile and site origin using local storage. Clearing site data, private browsing
+or unavailable storage can cause it to appear again; no visitor account or tracking
+is used. **Get started** remains available for the full setup instructions.
+
+Open **Get started**, next to the theme switch, to choose your agent and download
+its reference.
 Alternatively, **Copy AI reference** fetches that same standard file and appends
 the selected diagram's raw URL as reference context only. The agent first reads `airflow.md`; Project remains the workflow entry even when
 viewing Design or another child. If clipboard access
@@ -227,7 +249,7 @@ URL/path in your repository's copy of the instructions.
 
 ### Shared remote workflows
 
-The standard instructions are also directly accessible at
+The shared short reference is also directly accessible at
 `https://vanlangen.org/airflow/copilot-instructions.md`. It is only a short
 reference. The full method stays in `airflow.md` and the adjacent `flows/` directory
 in this repository, so consumers do not maintain a copied method definition.
@@ -280,7 +302,8 @@ individual `.air/` Markdown files.
 Prefer local, version-controlled files when a workflow belongs to one project.
 For example, store `airflow.md` and its `flows/` directory under
 `docs/ai-workflows/`, preserving their relative layout. Reference the local method
-entry from `.github/copilot-instructions.md`:
+entry from your agent’s instruction file (`.github/copilot-instructions.md`,
+`AGENTS.md` or `CLAUDE.md`):
 
 ```markdown
 For development work, read and follow docs/ai-workflows/airflow.md before acting

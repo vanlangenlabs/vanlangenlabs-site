@@ -159,3 +159,15 @@ footer { display: flex; justify-content: space-between; gap: 16px; color: var(--
   footer { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { .theme-switch input::after { transition: none; } }
+#welcome-dialog { width: min(560px, calc(100% - 32px)); }
+#welcome-dialog p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.welcome-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.welcome-actions button { padding: 10px 14px; }
+
+.beta-badge { display: inline-block; vertical-align: middle; padding: 3px 7px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); font: 600 11px 'DM Sans', sans-serif; }
+.ai-context ol { padding-left: 22px; }
+.ai-context li { margin-bottom: 12px; }
+.ai-context li a { display: inline; margin: 0; }
+
+.agent-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0; color: var(--ink); }
+.agent-choice select { max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: inherit; }

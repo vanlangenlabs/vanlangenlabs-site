@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="AIRFlow: an AI-assisted software development method documented with Mermaid diagrams, with original sources for AI agents and Copilot instructions.">
+  <meta name="description" content="AIRFlow: an AI-assisted software development method documented with Mermaid diagrams, with original sources and setup instructions for Copilot, Codex and Claude Code.">
   <title>AIRFlow | AI-Assisted Development Method</title>
   <link rel="stylesheet" href="css/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
   <header class="header">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AI<span class="brand-highlight">R</span>Flow Viewer</h1><p>AI Routing Flow &middot; AI-assisted development method</p></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AI<span class="brand-highlight">R</span>Flow Viewer <span class="beta-badge">Beta</span></h1><p>AI Routing Flow &middot; AI-assisted development method</p></div></div>
     <div class="header-actions"><button id="get-started" type="button" class="get-started" aria-haspopup="dialog">Get started</button><label class="theme-switch"><input id="theme" type="checkbox" role="switch"><span>Dark theme</span></label></div>
   </header>
   <main class="viewer-layout">
@@ -59,24 +59,37 @@
     </dialog>
     </div>
   </main>
+  <dialog id="welcome-dialog" aria-labelledby="welcome-title" aria-describedby="welcome-description">
+    <div class="dialog-content">
+      <header class="dialog-header"><h2 id="welcome-title">A shared workflow for you and your AI</h2><button id="close-welcome" type="button" class="close-dialog" aria-label="Close introduction" autofocus>&times;</button></header>
+      <p id="welcome-description">AIRFlow is a development method for developers and teams working with AI coding agents.</p>
+      <p>Give your agent a clear process for defining, designing, building and checking software. You approve key decisions; the agent works within those boundaries.</p>
+      <p>Explore the flows here, or add the small agent reference to your repository to get started.</p>
+      <div class="welcome-actions"><button id="welcome-explore" type="button">Explore workflows</button><button id="welcome-setup" type="button" class="get-started">Set up in my repository</button></div>
+    </div>
+  </dialog>
   <dialog id="get-started-dialog" aria-labelledby="get-started-title">
     <div class="dialog-content">
       <header class="dialog-header"><h2 id="get-started-title">AI-assisted development method</h2><button id="close-get-started" type="button" class="close-dialog" aria-label="Close Get started" title="Close" autofocus>&times;</button></header>
       <div class="ai-context">
-        <p>AIRFlow describes AI software development workflows as Mermaid diagrams. People view the diagram; AI agents read the original <code>.mmd</code> source. This is a read-only viewer, not an editor or an agent runner.</p>
-        <h3>Use with AI / Copilot</h3>
-        <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download Copilot reference</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. This short file points to the shared <code>airflow.md</code>, which provides the rules and links to Project; no viewer setup is required.</p>
-        <p>Copy AI reference uses the same short reference and adds the selected diagram as context. The agent first reads <code>airflow.md</code> and enters through Project, not independently at that diagram.</p>
-        <a id="ai-source-link" hidden></a>
-        <h3>Project records and resuming</h3>
-        <p>In the consuming repository, AIRFlow-managed project records live in <code>.air/</code>; <code>.air/index.md</code> tracks inventory, status and resume state. Phase-specific criteria are in the active Mermaid subflow. The <a href="airflow.md">global instructions</a> define storage, approval evidence and resuming; phase-specific transitions and repair rules are embedded in the Mermaid flows.</p>
-        <h3>Project calls the subflows</h3>
-        <p>Read <code>airflow.md</code> and its Project link, then follow the sequence and retrieve only the active Mermaid subflow. Follow that phase's embedded criteria and feedback loops; return each explicit outcome to the caller and follow its matching edge. Only success satisfies completion and required approvals; blocked outcomes pause the affected work. Project determines the next phase.</p>
-        <p>The diagram defines the process, not current project state. Read only the relevant entries in the consuming repository's <code>.air/index.md</code> to restore phase, call stack, artifacts, checks and approval evidence.</p>
-        <p>For local workflows, keep <code>airflow.md</code> and its <code>flows/</code> directory together and point the short reference to that local entry. For shared workflows, pin the <code>airflow.md</code> URL to a release or commit for reproducible instructions. Web access depends on the AI agent's tools and permissions.</p>
+        <p>AIRFlow helps developers and teams give AI coding agents a clear development process. The agent follows the flows; you approve key decisions.</p>
+        <label class="agent-choice" for="agent-select">Your coding agent
+          <select id="agent-select">
+            <option value="copilot">GitHub Copilot</option>
+            <option value="codex">OpenAI Codex</option>
+            <option value="claude">Claude Code</option>
+          </select>
+        </label>
+        <ol>
+          <li><a id="agent-download" href="copilot-instructions.md" download="copilot-instructions.md">Download the Copilot reference</a></li>
+          <li><span id="agent-placement" aria-live="polite">Save it as <code>.github/copilot-instructions.md</code> in your repository.</span> If that file exists, add the reference to it; keep your existing instructions.</li>
+          <li>Ask your agent to use AIRFlow for your development task. It reads the online rules and retrieves the flows it needs.</li>
+        </ol>
+        <p>Your agent needs access to the linked files. You do not need to download the diagrams or set up this viewer.</p>
+        <p>AIRFlow is in beta. Review the agent’s work and share feedback on unclear steps or unexpected behavior.</p>
       </div>
       <div class="reference-heading"><h3>AI reference to copy</h3><button id="copy-ai-dialog" class="copy-ai" type="button" disabled>Copy AI reference</button></div>
-      <p id="instructions-status" role="status">Loading Copilot reference...</p>
+      <p id="instructions-status" role="status">Loading AIRFlow reference...</p>
       <p id="ai-copy-status" role="status" aria-live="polite"></p>
       <pre><code id="ai-reference"></code></pre>
     </div>
