@@ -24,19 +24,19 @@ flowchart TD
 %% a new scope approval. Deferring new planning leaves backlog unchanged;
 %% deferring an existing release preserves its membership and valid evidence.
 %% Record approval evidence in `.air/index.md` using the global instructions.
-%%
+
 %% Feature transitions owned by this phase:
 %% - `backlog` -> `selected`: Human approves inclusion in a release scope.
 %% - `selected` / `implementing` / `verifying` / `verified` -> `backlog`: Human removes feature from scope or cancels release; Definition remains approved. Preserve historical evidence.
-%%
+
 %% A feature belongs to at most one active release. Removing an unapproved feature
 %% keeps it clarifying, deferred or rejected, never backlog. Release deferral keeps
 %% membership and valid evidence; execution waits for explicit human reopening.
-%%
+
 %% Release transition `planning -> scope-pending-approval`: Self-reviewed scope lists exact feature IDs and version; record_status becomes pending-approval. Owner: AI prepares and requests approval.
-%%
+
 %% Release transition `scope-pending-approval -> scope-approved`: Scope digest is explicitly approved; append approval event. Owner: Human.
-%%
+
 %% Release transition `deferred -> planning`: User explicitly reopens planning; revalidate the backlog and release goals. Owner: Human.
 %% @end-airflow-context
 

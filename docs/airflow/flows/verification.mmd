@@ -22,7 +22,7 @@ flowchart TD
 %% Record check names, results, input digests and code revision or working-tree
 %% evidence in .air/index.md. Return findings and affected IDs to the caller;
 %% do not select the next feature or call development subflows here.
-%%
+
 %% Feature transitions owned by this phase:
 %% - `selected` -> `verifying`: Impact analysis proves existing implementation reusable; current approvals permit re-verification.
 %% - `selected` -> `verified`: Impact analysis proves both implementation and passing checks unaffected by the revision.
@@ -40,9 +40,9 @@ flowchart TD
 %% Feature checks do not replace integration and release acceptance checks.
 %% Re-run affected feature checks after repair before repeating release checks.
 %% Passing checks do not authorize publication.
-%%
+
 %% Release transition `implementing -> verifying`: All scoped features have current passing feature checks; release integration checks begin. Owner: AI, based on evidence.
-%%
+
 %% Release transition `verifying -> release-ready`: Every feature and release-level check passes against current approved inputs. Owner: AI, based on evidence.
 %% @end-airflow-context
 

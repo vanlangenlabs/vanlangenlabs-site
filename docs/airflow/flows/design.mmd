@@ -9,7 +9,7 @@ flowchart TD
 %% Design how the selected features work together as one version: shared
 %% components, interfaces, dependencies, data flows, risks, rollout and test
 %% approach. Trace every feature acceptance criterion to the integrated Design.
-%%
+
 %% Record path: `.air/releases/<version>/design.md`.
 %% Record outline: Scope reference; Integrated approach; Components and interfaces; Data and end-to-end behavior; Feature-to-design traceability; Risks and tradeoffs; Rollout and test strategy.
 %% Mutable statuses belong in the index. Example IDs and versions are placeholders.
@@ -32,9 +32,9 @@ flowchart TD
 %% The human approves the integrated Design against the current scope digest.
 %% Bind approval to the exact Design digest and record evidence in `.air/index.md`.
 %% Material scope/design changes invalidate affected approvals using Project impact rules.
-%%
+
 %% Release transition `scope-approved -> design-pending-approval`: Self-reviewed Design covers every scoped feature and records its scope digest; record_status becomes pending-approval. Owner: AI prepares and requests approval.
-%%
+
 %% Release transition `design-pending-approval -> design-approved`: Design digest is explicitly approved; append approval event. Owner: Human.
 %% @end-airflow-context
     designApproval -- Defer release --> designDeferred([Release deferred])
