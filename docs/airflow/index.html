@@ -12,7 +12,7 @@
 </head>
 <body>
   <header class="header">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AI<span class="brand-highlight">R</span>Flow Viewer <span class="beta-badge">Beta</span></h1><p>AI Routing Flow &middot; AI-assisted development method</p></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">A/</span><div><h1>AI<span class="brand-highlight">R</span>Flow Viewer <span class="beta-badge">Beta</span></h1><p>AI Routing Flow &middot; AI-assisted development method</p></div><button id="open-welcome" type="button" class="brand-trigger" aria-label="Show AIRFlow introduction" aria-haspopup="dialog" aria-controls="welcome-dialog" title="About AIRFlow"></button></div>
     <div class="header-actions"><button id="get-started" type="button" class="get-started" aria-haspopup="dialog">Get started</button><label class="theme-switch"><input id="theme" type="checkbox" role="switch"><span>Dark theme</span></label></div>
   </header>
   <main class="viewer-layout">
@@ -62,7 +62,7 @@
   <dialog id="welcome-dialog" aria-labelledby="welcome-title" aria-describedby="welcome-description">
     <div class="dialog-content">
       <header class="dialog-header"><h2 id="welcome-title">A shared workflow for you and your AI</h2><button id="close-welcome" type="button" class="close-dialog" aria-label="Close introduction" autofocus>&times;</button></header>
-      <p id="welcome-description">AIRFlow is a development method for developers and teams working with AI coding agents.</p>
+      <p id="welcome-description">AIRFlow uses Mermaid: diagrams are human-readable, and their source is machine-readable for AI agents.</p>
       <p>Give your agent a clear process for defining, designing, building and checking software. You approve key decisions; the agent works within those boundaries.</p>
       <p>Explore the flows here, or add the small agent reference to your repository to get started.</p>
       <div class="welcome-actions"><button id="welcome-explore" type="button">Explore workflows</button><button id="welcome-setup" type="button" class="get-started">Set up in my repository</button></div>
@@ -96,5 +96,15 @@
     </div>
   </dialog>
   <footer><span>AIRFlow <span class="footer-dot" aria-hidden="true">/</span> AI Routing Flow</span><span>One source. Human &amp; AI.</span></footer>
+  <script src="./logo.js" defer></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XVNTVJLKH3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-XVNTVJLKH3');
+  </script>
 </body>
 </html>

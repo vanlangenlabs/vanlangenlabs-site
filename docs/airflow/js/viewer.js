@@ -555,6 +555,7 @@ gettingStarted.addEventListener('click', (event) => {
 const welcome = byId('welcome-dialog');
 const welcomeSeenKey = 'airflow-welcome-seen';
 function dismissWelcome() { welcome.close(); }
+byId('open-welcome').addEventListener('click', () => welcome.showModal());
 byId('close-welcome').addEventListener('click', dismissWelcome);
 byId('welcome-explore').addEventListener('click', dismissWelcome);
 byId('welcome-setup').addEventListener('click', () => {
