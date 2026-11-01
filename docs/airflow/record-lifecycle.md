@@ -126,10 +126,10 @@ a release. The AI may propose these transitions but may not perform the human de
 | `scope-approved -> design-pending-approval` | Integrated design covers every scoped feature and records the scope digest it used. | AI prepares; index records draft. |
 | `design-pending-approval -> design-approved` | Design digest is explicitly approved; append approval event. | Human. |
 | `design-approved -> implementing` | Current scope/design digests still match their approvals and tool permissions allow the work. | AI, based on evidence. |
-| `implementing -> verifying` | Every scoped feature reports completed tasks and focused checks. | AI, based on evidence. |
+| `implementing -> verifying` | All scoped features have current passing feature checks; release integration checks begin. | AI, based on evidence. |
 | `verifying -> release-ready` | Every feature and release-level check passes against current approved inputs. | AI, based on evidence. |
 | `release-ready -> pending-publication-authorization` | Record check results and request publication authorization for current scope/design digests. | AI requests; human decides. |
-| `pending-publication-authorization -> published` | Explicit authorization matches the current release digests; publication action is permitted. | Human authorizes; AI executes only if permitted. |
+| `pending-publication-authorization -> published` | Explicit authorization matches the current release digests; publication action is permitted and its success is confirmed. | Human authorizes; AI executes only if permitted. |
 | Any active release -> `blocked` | Conflict, missing approval/evidence, failing checks or external blocker is recorded. | AI records; user resolves decision/blocker. |
 | `blocked -> prior active status` | Cause resolved and required approvals/checks refreshed. | AI based on evidence; human for approval transitions. |
 | Pre-publication status -> `deferred` / `cancelled` | User explicitly defers or cancels the release. | Human. |
@@ -296,6 +296,8 @@ reuse an ID.
 - phase: <stable subflow ID>
 - node_id: <stable Mermaid node ID>
 - call_stack: <caller node -> subflow node -> current node>
+- call_arguments: <feature/release mode, target IDs, new-work/rework, findings>
+- pending_targets: <affected feature IDs in dependency order or none>
 - feature_id: <ID or none>
 - release_id: <version or none>
 - next_action: <specific action, decision or evidence needed>
@@ -323,6 +325,24 @@ not a generated SVG DOM ID whose numeric suffix can change when nodes are insert
 Use `unknown` or `none` where the information is genuinely unavailable; never fill
 a field from assumption.
 
+## Subflow calls and outcomes
+
+Project owns feature selection and cross-phase repair routing. Verification takes
+`feature` or `release` mode and returns evidence-backed outcomes. Implementation
+receives a feature ID, `new-work` or `rework` mode and findings; it returns to its
+actual caller without changing target. Store these arguments with the call frame.
+For multiple affected features, record the pending target IDs and process them in
+dependency order. Invalidate affected verification before selection; preserve
+unaffected evidence with an impact rationale. Run release checks only when every
+scoped feature has current passing evidence.
+
+Explicit non-success terminal outcomes return to the caller's matching edge; they
+do not satisfy completion or approval. Blocked outcomes pause the affected work.
+Internal self-review failures loop autonomously while concrete progress is possible;
+missing product decisions, unbounded impact or repeated lack of progress require a
+focused blocker report. On resolution, resume the recorded blocked step with the
+new evidence, not an assumed successful outcome.
+
 ## Resume validation
 
 Before resuming, verify all of the following against the current files:
@@ -343,6 +363,9 @@ Before resuming, verify all of the following against the current files:
 If a record/index check fails, set execution status to `blocked`, list the exact
 mismatch and ask how to reconcile it. Do not skip nodes, reconstruct missing
 approvals, or infer current state from a tracker, branch name, issue order or artifact.
+
+For this orchestration revision, consult `workflow-migration.md` for old-to-new
+node mappings and changed call semantics.
 
 If the shared workflow version changed, do not silently replace the recorded ref.
 Compare old and new sources and any node-ID migration map. A user must authorize

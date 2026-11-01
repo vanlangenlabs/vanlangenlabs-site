@@ -6,7 +6,8 @@ flowchart TD
 %% do not treat issue order or tracker status alone as user approval.
 %% @end-airflow-context
     readBacklog --> propose[Propose a coherent feature set for a version]
-    propose --> scopeApproval{User approves release scope?}
+    propose --> draft[Save proposed scope draft for exact-version review]
+    draft --> scopeApproval{User approves release scope?}
     scopeApproval -- No: revise proposed scope --> propose
     scopeApproval -- Defer release planning --> planningDeferred([Release planning deferred])
     scopeApproval -- Cancel release --> releaseCancelled([Release cancelled])

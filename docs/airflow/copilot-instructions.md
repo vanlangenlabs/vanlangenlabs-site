@@ -15,6 +15,9 @@ workflow diagram, not an executable script. Use an available web-fetch tool or a
 configured local copy. If Project is inaccessible, report the limitation and
 ask for an accessible copy; do not invent its contents.
 
+The shared contract is `../record-lifecycle.md` relative to the Project source
+URL or local path, not relative to the consuming repository's instructions file.
+
 ## Project Workspace Setup
 
 After reading Project and before following its first pending node, inspect
@@ -33,9 +36,11 @@ feature or release records.
    nested calls, apply the same rule and retain the calling step.
 4. Pause for explicit human approval at approval decisions. Never approve your
    own work or infer approval merely because an artifact exists.
-5. Return to the caller only when the subflow reaches its successful terminal
-   node and all required approvals and checks have been satisfied. Then follow
-   the caller's next edge. Failed reviews or tests follow the stated feedback loop.
+5. Return the explicit terminal outcome to the caller: success, repair needed,
+   deferred, rejected, cancelled or blocked. Follow only its matching edge.
+   Only success satisfies completion; other outcomes never imply approval.
+   A blocked outcome pauses the affected work until the missing input is resolved.
+   Internal failed reviews follow their repair loop before returning.
 6. If a referenced file or transition is unclear, stop and ask. A selected
    diagram, viewer breadcrumb or navigation index does not change the entry point.
 
@@ -63,7 +68,7 @@ without evidence.
 
 ## Node Context
 
-Project may include `%% @airflow-context <node-id>` comment blocks ending with
+Any flow may include `%% @airflow-context <node-id>` comment blocks ending with
 `%% @end-airflow-context`. Read these as Markdown context for the matching
 Mermaid node. Use them to understand the node's purpose, focus and expected
 outcome; they do not replace the referenced subflow or its approval decisions.

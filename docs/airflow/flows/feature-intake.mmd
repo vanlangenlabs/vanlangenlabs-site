@@ -15,6 +15,7 @@ flowchart TD
     ready -- No: ask and refine --> clarify
     ready -- Yes: create or update draft --> draft[Draft feature Definition in `.air/features/F-0001/definition.md`]
     draft --> definition[["Definition: definition.mmd"]]
+    definition -- Blocked --> blocked([Blocked: await missing decision])
     definition -- Approved: add to `.air/index.md` backlog --> backlog[Feature in approved backlog]
     definition -- Deferred: update `.air/index.md` --> deferred[Feature deferred]
     definition -- Rejected: record decision --> rejected[Feature rejected]

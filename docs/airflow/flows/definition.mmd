@@ -6,7 +6,17 @@ flowchart TD
 %% template in the record contract. Make acceptance criteria observable and
 %% testable; record dependencies, constraints, non-goals and unresolved questions.
 %% @end-airflow-context
-    specify --> definitionApproval{Feature definition approved by user?}
+    specify --> review[Check boundaries, dependencies and observable acceptance criteria]
+    review --> quality{Definition consistent and sufficiently specified?}
+    quality -- No: resolvable from available evidence --> specify
+    quality -- Missing product decision --> blocked([Blocked: ask focused question])
+    quality -- Yes: save reviewed draft --> definitionApproval{Feature definition approved by user?}
+%% @airflow-context review
+%% Resolve omissions from existing approved context where possible. Ensure each
+%% acceptance criterion is observable, scope/non-goals agree, dependencies are
+%% explicit and no unresolved question prevents design. Never invent requirements
+%% or ask the human to perform this completeness check for the AI.
+%% @end-airflow-context
     definitionApproval -- No: ask questions or revise --> clarify
     definitionApproval -- Yes: save feature definition --> definitionReady([Feature added to backlog])
     definitionApproval -- Defer --> deferred([Deferred: keep out of release scope])

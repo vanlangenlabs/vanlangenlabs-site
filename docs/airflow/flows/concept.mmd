@@ -4,9 +4,12 @@ flowchart TD
 %% Store only the stable product rationale in `.air/concept.md`: the problem,
 %% intended users, desired outcome, boundaries and success measures. Do not list
 %% all features here or introduce technical implementation choices.
+%% @end-airflow-context
     concept --> conceptApproval{Product concept approved?}
     conceptApproval -- No: refine the problem or outcome --> concept
     conceptApproval -- Yes: save `.air/concept.md` --> conceptReady([Project concept established])
+%% @airflow-context conceptApproval
+%% Save the draft before requesting approval.
 %% Obtain explicit human approval for the exact current file digest. Record the
 %% decision evidence in `.air/index.md` according to the contract's Approval
 %% evidence section. Revisit only when the product direction materially changes.

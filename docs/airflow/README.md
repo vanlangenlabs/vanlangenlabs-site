@@ -54,17 +54,17 @@ index shows a navigation error without preventing direct workflow URLs from load
 
 `flows/project.mmd` is the orchestrating entry point. Its subroutine nodes
 call separate files relative to that source URL; it does not duplicate their
-internal steps. Complete each subflow and its required approvals before returning
-to Project and following its next edge. The phases are not independently chosen.
+internal steps. Return each subflow outcome to its caller and follow the matching edge; only
+success satisfies its required approvals and checks. The phases are not independently chosen.
 Concept is the product rationale and is approved once. Feature intake and
 Definition create separately approved feature records in the backlog. Release
 planning selects a set of feature IDs for a version; Design describes that set
 as one coherent release. Implementation and Verification then run per feature
 in the approved scope. Only after every scoped feature and the release-level
 checks pass, and the user authorizes publication, is the release published.
-Later releases return to Feature intake, not Concept. Verification diagnoses
-failures and routes them to Implementation, approved Design rework, or a blocker
-report rather than retrying blindly.
+Later releases return to Feature intake, not Concept. Verification returns evidence-backed outcomes; Project selects features and
+routes repairs to Implementation, Definition or Design. Each repair invalidates
+affected evidence before feature and release checks are repeated.
 
 The consuming project stores its AI-managed records under `.air/`, not in this
 AIRFlow method repository. The downloaded Copilot instructions initialize that
@@ -259,8 +259,8 @@ the active subflow, then read only relevant `.air/` records:
    file calls that subflow; resolve the filename relative to the caller's source.
 3. Read and follow the subflow, including its loops and human approval gates.
    For nested calls, retain the calling step and apply the same rule recursively.
-4. Return only after reaching the subflow's successful terminal node and satisfying
-   required approvals and checks. Project then determines the next phase.
+4. Return the explicit terminal outcome to the caller. Follow its matching edge;
+   only success satisfies completion. Blocked outcomes pause affected work.
 5. On resume, inspect only the active `.air/index.md` entries and referenced
    records. Consult the relevant `record-lifecycle.md` section only for a mismatch,
    approval, change-impact or conflict question; block on unresolved inconsistencies.

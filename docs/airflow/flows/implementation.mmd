@@ -1,7 +1,8 @@
 flowchart TD
-    start([Select next feature in approved release scope]) --> plan[Derive tasks from its Definition and release Design]
+    start([Implement caller-supplied scoped feature]) --> plan[Derive tasks from its Definition and release Design]
 %% @airflow-context plan
-%% Use only the active feature's approved Definition and the currently approved
+%% Caller supplies feature ID, new-work/rework mode and any findings. Keep that
+%% target throughout this call; do not select a different feature. Use its approved Definition and the currently approved
 %% release Design. Record the active feature/node and next action in `.air/index.md`;
 %% create external tasks only when a tracker is configured and authorized.
 %% @end-airflow-context
@@ -14,7 +15,7 @@ flowchart TD
     implement --> checks[Run focused checks and update `.air/index.md`]
     checks --> complete{Feature tasks complete and focused checks pass?}
     complete -- No: continue or fix --> implement
-    complete -- Yes: return to Project --> implementationComplete([Feature implementation complete])
+    complete -- Yes: return to caller --> implementationComplete([Feature implementation complete])
     complete -- Blocked or scope unclear: stop and report --> blocked([Blocked: ask user])
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52

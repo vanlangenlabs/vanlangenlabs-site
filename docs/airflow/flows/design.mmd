@@ -11,7 +11,17 @@ flowchart TD
 %% approach. Trace every feature acceptance criterion to the integrated Design.
 %% @end-airflow-context
     integrate --> review[Check architecture, interfaces, dependencies, risks and acceptance coverage]
-    review --> designApproval{Integrated release design approved by user?}
+    review --> quality{Design complete, consistent and acceptance criteria covered?}
+    quality -- No: independently resolvable --> integrate
+    quality -- Missing requirement or decision --> blocked([Blocked: report precise question])
+    quality -- Yes: save reviewed draft --> designApproval{Integrated release design approved by user?}
+%% @airflow-context review
+%% Inspect existing architecture and constraints. Check every acceptance criterion
+%% has a design mapping and verification approach; check interfaces, dependencies,
+%% failure paths, rollout and risks for contradictions or omissions. Correct
+%% in-scope gaps autonomously before requesting approval. Do not invent product
+%% requirements. Escalate unresolved decisions or lack of progress with evidence.
+%% @end-airflow-context
     designApproval -- No: revise and review again --> integrate
     designApproval -- Yes: save release design --> designReady([Release design approved])
 %% @airflow-context designApproval
