@@ -5,6 +5,13 @@ flowchart TD
 %% target throughout this call; do not select a different feature. Use its approved Definition and the currently approved
 %% release Design. Record the active feature/node and next action in `.air/index.md`;
 %% create external tasks only when a tracker is configured and authorized.
+%%
+%% Feature transitions owned by this phase:
+%% - `selected` -> `implementing`: Current Definition, scope and Design approvals permit implementation.
+%% - `implementing` -> `verifying`: Tasks and focused checks pass against current inputs.
+%% - `verifying` / `verified` -> `implementing`: Evidence identifies required code repair; current approvals still permit implementation. Invalidate affected checks.
+%%
+%% Release transition `design-approved -> implementing`: Current scope/design digests still match their approvals and tool permissions allow the work. Owner: AI, based on evidence.
 %% @end-airflow-context
     plan --> implement[Implement the feature within the approved scope]
 %% @airflow-context implement

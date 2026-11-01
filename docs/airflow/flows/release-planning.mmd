@@ -17,10 +17,30 @@ flowchart TD
 %% The human approves the exact version, included feature IDs, exclusions and
 %% release goals. Bind the decision to the scope file digest. A changed set needs
 %% a new scope approval; deferred planning leaves features in the backlog.
-%% Record approval evidence in `.air/index.md` using the contract.
+%% Record approval evidence in `.air/index.md` using the global instructions.
+%%
+%% Feature transitions owned by this phase:
+%% - `backlog` -> `selected`: Human approves inclusion in a release scope.
+%% - `selected` / `implementing` / `verifying` / `verified` -> `backlog`: Human removes feature from scope or cancels release; Definition remains approved. Preserve historical evidence.
+%%
+%% A feature belongs to at most one active release. Removing an unapproved feature
+%% keeps it clarifying, deferred or rejected, never backlog. Release deferral keeps
+%% membership and valid evidence; execution waits for explicit human reopening.
+%%
+%% Release transition `planning -> scope-pending-approval`: Self-reviewed scope lists exact feature IDs and version; record_status becomes pending-approval. Owner: AI prepares and requests approval.
+%%
+%% Release transition `scope-pending-approval -> scope-approved`: Scope digest is explicitly approved; append approval event. Owner: Human.
+%%
+%% Release transition `deferred -> planning`: User explicitly reopens planning; revalidate the backlog and release goals. Owner: Human.
 %% @end-airflow-context
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52
     class start,scopeReady,planningDeferred,releaseCancelled boundary
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
     class scopeApproval approval
+
+%% @airflow-context propose
+%% Record path: `.air/releases/<version>/scope.md`.
+%% Record outline: Release goal; Included feature IDs; Excluded or deferred feature IDs; Dependencies and ordering; Release-level acceptance criteria.
+%% Mutable statuses belong in the index. Example IDs and versions are placeholders.
+%% @end-airflow-context

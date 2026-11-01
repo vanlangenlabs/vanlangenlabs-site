@@ -65,18 +65,18 @@
       <div class="ai-context">
         <p>AIRFlow describes AI software development workflows as Mermaid diagrams. People view the diagram; AI agents read the original <code>.mmd</code> source. This is a read-only viewer, not an editor or an agent runner.</p>
         <h3>Use with AI / Copilot</h3>
-        <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download standard Copilot instructions</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. The standard instructions already reference the shared Project workflow; no viewer setup is required.</p>
-        <p>Copy AI reference uses the same standard instructions and adds the selected diagram as context. The agent must still enter through Project, not start independently at that diagram.</p>
+        <p><a href="copilot-instructions.md" download="copilot-instructions.md">Download Copilot reference</a>Place this file at <code>.github/copilot-instructions.md</code> in your repository, or merge it into existing instructions. This short file points to the shared <code>airflow.md</code>, which provides the rules and links to Project; no viewer setup is required.</p>
+        <p>Copy AI reference uses the same short reference and adds the selected diagram as context. The agent first reads <code>airflow.md</code> and enters through Project, not independently at that diagram.</p>
         <a id="ai-source-link" hidden></a>
         <h3>Project records and resuming</h3>
-        <p>In the consuming repository, AIRFlow-managed project records live in <code>.air/</code>; <code>.air/index.md</code> tracks inventory, status and resume state. Phase-specific criteria are in the active Mermaid subflow. The <a href="record-lifecycle.md">project record contract</a> is detailed reference for approvals, changes and conflicts; consult only the relevant part when needed.</p>
+        <p>In the consuming repository, AIRFlow-managed project records live in <code>.air/</code>; <code>.air/index.md</code> tracks inventory, status and resume state. Phase-specific criteria are in the active Mermaid subflow. The <a href="airflow.md">global instructions</a> define storage, approval evidence and resuming; phase-specific transitions and repair rules are embedded in the Mermaid flows.</p>
         <h3>Project calls the subflows</h3>
-        <p>Read Project, then follow its sequence and retrieve only the active Mermaid subflow. Follow that phase's embedded criteria and feedback loops; return to Project only after its successful terminal state and required approval. Project determines the next phase.</p>
+        <p>Read <code>airflow.md</code> and its Project link, then follow the sequence and retrieve only the active Mermaid subflow. Follow that phase's embedded criteria and feedback loops; return each explicit outcome to the caller and follow its matching edge. Only success satisfies completion and required approvals; blocked outcomes pause the affected work. Project determines the next phase.</p>
         <p>The diagram defines the process, not current project state. Read only the relevant entries in the consuming repository's <code>.air/index.md</code> to restore phase, call stack, artifacts, checks and approval evidence.</p>
-        <p>For project-specific workflows, keep the Mermaid files in your repo and reference their local paths. For shared remote workflows, pin a release or commit for reproducible instructions. Web access depends on the AI agent's tools and permissions.</p>
+        <p>For local workflows, keep <code>airflow.md</code> and its <code>flows/</code> directory together and point the short reference to that local entry. For shared workflows, pin the <code>airflow.md</code> URL to a release or commit for reproducible instructions. Web access depends on the AI agent's tools and permissions.</p>
       </div>
-      <div class="reference-heading"><h3>AI instruction fragment</h3><button id="copy-ai-dialog" class="copy-ai" type="button" disabled>Copy AI reference</button></div>
-      <p id="instructions-status" role="status">Loading standard instructions...</p>
+      <div class="reference-heading"><h3>AI reference to copy</h3><button id="copy-ai-dialog" class="copy-ai" type="button" disabled>Copy AI reference</button></div>
+      <p id="instructions-status" role="status">Loading Copilot reference...</p>
       <p id="ai-copy-status" role="status" aria-live="polite"></p>
       <pre><code id="ai-reference"></code></pre>
     </div>

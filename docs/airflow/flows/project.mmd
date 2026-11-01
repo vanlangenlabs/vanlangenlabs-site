@@ -1,11 +1,52 @@
 flowchart TD
     start([Start or resume project]) --> restore[Validate index, workflow version, records and evidence]
 %% @airflow-context restore
-%% Shared contract: ../record-lifecycle.md, relative to this source. Read only the
-%% applicable section. Initialize missing .air/ from its templates. On resume,
+%% Initialize missing .air/ using the global instructions. On resume,
 %% validate the saved node and call stack, then continue that exact pending step;
 %% the entry decision below is for runs without an active saved position.
 %% Do not replay Concept or choose a phase from artifact existence alone.
+%%
+%% # Workflow revision: explicit orchestration and self-review
+%%
+%% This revision changes transition semantics. Existing runs must follow the global instructions'
+%% Resume validation rules and receive user authorization before changing versions.
+%% Retain the old source and call stack until the pending work is reconciled.
+%%
+%% - Old position; New position / required reconciliation
+%% - Project start -> concept; restore; validate saved position or current Concept approval
+%% - Verification implementation; Project implementation; preserve target and repair findings
+%% - Verification definition; Project definition; preserve target and proposed change
+%% - Verification releasePlanning; Project releasePlanning; preserve impact and decision evidence
+%% - Verification design / designForChangedDefinition; Project design; preserve required reapproval
+%% - Verification impact / scopeImpact / designImpact; Corresponding Project node; preserve impact evidence
+%% - Verification moreUnverified; Project select; inspect current feature evidence
+%% - Verification releaseDiagnosis / releaseRootCause; Verification diagnosis / rootCause in release mode
+%% - Verification testing / featureChecksPassed; Same node in feature mode; add explicit target
+%% - Verification releaseChecks / releaseChecksPassed; Same node in release mode; validate feature evidence
+%% - Implementation start / plan; Same node with explicit feature ID and new-work/rework mode
+%% - Design review; Same node, followed by mandatory quality decision
+%% - Definition specify; Same node, followed by mandatory self-review
+%% - Project releaseApproval / awaitingPublication; Same node; successful authorization leads to publish
+%%
+%% Other retained IDs do not by themselves establish semantic compatibility. Remove
+%% obsolete nested repair frames only after reconciling their pending outcome with
+%% Project. Never infer approval or publication success from migration. Re-evaluate
+%% only evidence affected by changed criteria; block when mapping is ambiguous.
+%%
+%% ## Status ownership revision
+%%
+%% Split legacy combined inventory status columns into Records (`record_status`),
+%% Features (`feature_status`) and Releases (`release_status`). Keep content files
+%% free of mutable statuses. Migrate one release status per version from evidence;
+%% never interpret Design `approved` as release `published` or record approval as
+%% release lifecycle. Preserve historical events. Conflicting legacy statuses require
+%% reconciliation before resuming. Apply the global instructions' user-authorized version
+%% migration rules; do not silently migrate an active run.
+%%
+%% Workflow maintenance checks: new project; next release; nested resume; rejected
+%% Design; changed Definition; code/design defects; missing evidence or tracker
+%% conflict; workflow migration; verified feature repair; Design revision with reuse;
+%% removed, deferred and cancelled scope. Trace these before publishing method changes.
 %% @end-airflow-context
     restore --> resume{Valid saved position?}
     resume -- Yes --> saved([Resume validated node and call stack])
@@ -28,10 +69,28 @@ flowchart TD
     work -- Feature verification needed --> verification[["Verification: verification.mmd"]]
     work -- All scoped features verified: release mode --> verification
 %% @airflow-context select
+%% Apply the responsible phase transition rules before selecting work.
 %% Use current evidence and dependency ordering; preserve unaffected feature work.
 %% Pass feature ID, new-work/rework mode and findings to Implementation. Pass
 %% feature/release mode and target IDs to Verification. Record caller and next
 %% action in the index. Never select a new feature while current rework is pending.
+%%
+%% Feature transitions owned by this phase:
+%% - `implementing` / `verifying` / `verified` -> `selected`: Scope or Design approval invalidated, with Definition unchanged; wait for renewed approvals before repair or reuse.
+%% - `verified` -> `released`: Containing release publication is confirmed and authorized.
+%% - Active status -> `blocked`: Unresolved conflict or external blocker; save prior status and required resolution.
+%% - `blocked` -> Saved prior status: Cause resolved and prior status invariants still hold; otherwise apply the relevant revision transition from that saved status.
+%%
+%% ## Subflow calls and outcomes
+%%
+%% Project owns feature selection and cross-phase repair routing. Verification takes
+%% `feature` or `release` mode and returns evidence-backed outcomes. Implementation
+%% receives a feature ID, `new-work` or `rework` mode and findings; it returns to its
+%% actual caller without changing target. Store these arguments with the call frame.
+%% For multiple affected features, record the pending target IDs and process them in
+%% dependency order. Invalidate affected verification before selection; preserve
+%% unaffected evidence with an impact rationale. Run release checks only when every
+%% scoped feature has current passing evidence.
 %% @end-airflow-context
     implementation -- Feature ready: feature mode --> verification
     implementation -- Blocked --> blocked
@@ -49,8 +108,50 @@ flowchart TD
     designImpact -- Yes --> design
     designImpact -- No --> select
 %% @airflow-context impact
-%% Apply the contract's Changes after approval rules. Preserve unaffected evidence
+%% Apply the impact rules below. Preserve unaffected evidence
 %% only with an explicit impact rationale. If impact cannot be bounded, block.
+%%
+%% ### Release revision and repair transitions
+%%
+%% Normal release lifecycle: planning -> scope-pending-approval -> scope-approved
+%% -> design-pending-approval -> design-approved -> implementing -> verifying
+%% -> release-ready -> pending-publication-authorization -> published.
+%% All except published are active. Deferred, blocked and cancelled are exceptions.
+%% Initial status is `planning`. Apply the earliest affected prerequisite first:
+%%
+%% - From; To; Required condition and evidence
+%% - Any active status after `planning`; `planning`; Scope approval invalidated: revise scope draft, then request approval through the normal route. Invalidate dependent Design and release checks.
+%% - `design-pending-approval` / `design-approved` / `implementing` / `verifying` / `release-ready` / `pending-publication-authorization`; `scope-approved`; Scope remains approved but Design approval is invalidated; revise Design draft, then request its approval.
+%% - `verifying` / `release-ready` / `pending-publication-authorization`; `implementing`; Approvals remain valid; affected feature implementation or feature checks need work.
+%% - `release-ready` / `pending-publication-authorization`; `verifying`; All feature evidence remains valid; repeat release-level checks only.
+%% - `scope-pending-approval`; `planning`; Human requests scope revision; scope record returns to `draft`.
+%% - `design-pending-approval`; `scope-approved`; Human requests Design revision; Design record returns to `draft`.
+%%
+%% A Definition revision pauses affected work at `clarifying` and triggers impact
+%% analysis. If scope approval is affected, use `planning`; if only Design approval
+%% is affected, use `scope-approved`; otherwise use `implementing` for affected
+%% feature work. An already earlier release status stays there. Re-entering
+%% implementation never bypasses approval checks for the revised Definition.
+%%
+%% Every revision after release checks invalidates affected checks and publication
+%% authorization. Re-request authorization after required checks pass. Authorization
+%% also binds the exact code/build being published, not just scope and Design files.
+%% A user-requested repeat check suspends publication until it passes; if inputs are
+%% unchanged, previously recorded authorization may remain valid with evidence.
+%%
+%% For `blocked`, save the prior status and apply revision rules to that status before
+%% resuming. For `deferred`, retain the hold; changes may invalidate evidence but do
+%% not resume work. Explicit reopening enters `planning` and revalidates scope.
+%% `published` and `cancelled` are terminal: use a new release version for later work.
+%% Changing a version retires the old unpublished release through explicit cancellation
+%% and creates a new planning entry; never silently rename a release ID.
+%%
+%% - Change; Approval/evidence impact; Resume point
+%% - Project purpose, users, outcome or boundary; Concept approval becomes stale; assess dependencies and mark only affected feature definitions, scopes and designs for reapproval.; Concept approval, then affected records; preserve unaffected approvals with evidence.
+%% - Feature behavior, scope, non-goals, dependencies or acceptance criteria; Definition approval becomes stale. Use dependency impact analysis to mark only affected scope/design approvals and feature verification stale; preserve unaffected approvals with evidence.; Definition; then reapprove only affected scope/design before continuing.
+%% - Release feature set, version, exclusions or goals; Scope approval and integrated design approval become stale; release-level verification becomes stale.; Release planning.
+%% - Integrated design architecture, interface, data flow or constraints; Design approval becomes stale; implementation and verification evidence for impacted features becomes stale.; Design approval, then reimplement/reverify impacted features.
+%% - Implementation code or configuration; Design/definition approval remains only if inputs are unchanged; checks covering changed behavior become stale.; Implementation checks and affected feature verification; rerun release integration checks for shared behavior.
 %% @end-airflow-context
     impact -- Unclear impact --> blocked
     verification -- Release passed --> releaseApproval{Human authorizes publication?}
@@ -78,3 +179,15 @@ flowchart TD
     classDef approval fill:#fff0e8,color:#633b2c,stroke:#c68162
     class start,saved,blocked,projectIdle,awaitingPublication,releasePublished boundary
     class releaseApproval,anotherRelease approval
+
+%% @airflow-context releaseApproval
+%% Release transition `release-ready -> pending-publication-authorization`: Record check results and request publication authorization for current scope/design digests. Owner: AI requests; human decides.
+%%
+%% Release transition `pending-publication-authorization -> published`: Explicit authorization matches the current release digests; publication action is permitted and its success is confirmed. Owner: Human authorizes; AI executes only if permitted.
+%%
+%% Release transition Any active release -> `blocked`: An unresolved conflict, unavailable required evidence or external blocker prevents progress. Diagnosed failures use the impact node repair transitions. Owner: AI records; resolution may require human input.
+%%
+%% Release transition `blocked -> prior active status`: Cause resolved and prior invariants hold; otherwise apply the applicable repair transition from the saved status. Owner: AI based on evidence; human for approval transitions.
+%%
+%% Release transition Pre-publication status -> `deferred` / `cancelled`: User explicitly defers or cancels the release. Owner: Human.
+%% @end-airflow-context

@@ -17,21 +17,33 @@ flowchart TD
     rootCause -- Unclear or external blocker --> blocked
 %% @airflow-context start
 %% Project supplies feature/release mode, target IDs and current approved inputs.
+%% Set feature_status to verifying for feature checks; release_status to verifying
+%% only for release checks. Apply the phase transitions when returning results.
 %% Record check names, results, input digests and code revision or working-tree
 %% evidence in .air/index.md. Return findings and affected IDs to the caller;
 %% do not select the next feature or call development subflows here.
+%%
+%% Feature transitions owned by this phase:
+%% - `selected` -> `verifying`: Impact analysis proves existing implementation reusable; current approvals permit re-verification.
+%% - `selected` -> `verified`: Impact analysis proves both implementation and passing checks unaffected by the revision.
+%% - `verifying` -> `verified`: Feature acceptance checks pass against current approved inputs and code.
+%% - `verified` -> `verifying`: Only checks need repeating; implementation remains valid.
 %% @end-airflow-context
 %% @airflow-context diagnosis
 %% Diagnose from concrete evidence, not test failure alone. A Definition change
 %% is a proposed requirement correction, never permission to weaken acceptance
 %% criteria to fit broken code. Identify targets and invalidate affected checks
-%% using ../record-lifecycle.md, Changes after approval. If cause or impact is
+%% using Project impact rules. If cause or impact is
 %% unclear, return Blocked. Project routes repair and required reapprovals.
 %% @end-airflow-context
 %% @airflow-context releaseChecks
 %% Feature checks do not replace integration and release acceptance checks.
 %% Re-run affected feature checks after repair before repeating release checks.
 %% Passing checks do not authorize publication.
+%%
+%% Release transition `implementing -> verifying`: All scoped features have current passing feature checks; release integration checks begin. Owner: AI, based on evidence.
+%%
+%% Release transition `verifying -> release-ready`: Every feature and release-level check passes against current approved inputs. Owner: AI, based on evidence.
 %% @end-airflow-context
 
     classDef boundary fill:#126a52,color:#ffffff,stroke:#126a52

@@ -350,7 +350,7 @@ async function loadInstructions() {
     instructionTemplate = text;
     byId('instructions-status').hidden = true;
   } catch (error) {
-    byId('instructions-status').textContent = `Could not load standard Copilot instructions. ${error.message}`;
+    byId('instructions-status').textContent = `Could not load the Copilot reference. ${error.message}`;
   }
 }
 
@@ -409,7 +409,7 @@ async function loadFlow(name) {
     byId('ai-source-link').textContent = url.href;
     byId('ai-source-link').hidden = false;
     if (instructionTemplate) {
-      byId('ai-reference').textContent = `${instructionTemplate.trimEnd()}\n\n## Selected Diagram (Context Only)\n\n${url.href}\n\nThe entry point remains Project; this reference does not authorize skipping subflows.\n`;
+      byId('ai-reference').textContent = `${instructionTemplate.trimEnd()}\n\n## Selected Diagram (Context Only)\n\n${url.href}\n\nRead airflow.md first and enter through its Project link; this selected diagram is context only and must not override the configured source version.\n`;
       aiCopyButtons.forEach((button) => { button.disabled = false; });
     }
     await renderSource(id);
@@ -512,7 +512,7 @@ async function copyAIReference() {
   } catch {
     aiCopyButtons.forEach((button) => { button.textContent = 'Copy AI reference'; });
     if (!gettingStarted.open) gettingStarted.showModal();
-    byId('ai-copy-status').textContent = 'Clipboard unavailable. The instruction fragment is selected for manual copying.';
+    byId('ai-copy-status').textContent = 'Clipboard unavailable. The AI reference is selected for manual copying.';
     const selection = window.getSelection();
     const range = document.createRange();
     range.selectNodeContents(byId('ai-reference'));

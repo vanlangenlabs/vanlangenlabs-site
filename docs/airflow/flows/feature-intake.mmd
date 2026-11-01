@@ -4,6 +4,16 @@ flowchart TD
 %% Accept a feature proposal from the conversation or the configured GitHub/GitLab
 %% tracker. The tracker is optional. Do not start implementation or select a
 %% release during intake.
+%%
+%% Feature transitions owned by this phase:
+%% - `proposed` -> `clarifying`: AI captures and refines the proposal.
+%% - `backlog` -> `deferred`: Human defers; existing Definition approval remains valid.
+%% - `deferred` -> `backlog`: Human reopens and existing Definition approval is still valid.
+%% - `deferred` / `rejected` -> `proposed`: Human reopens with no valid Definition approval; preserve decisions and use `record_status: draft`.
+%%
+%% New features start proposed. Active states: proposed, clarifying, backlog,
+%% selected, implementing, verifying, verified. Deferred/rejected need explicit
+%% reopening. Released is terminal; later changes use a new feature ID.
 %% @end-airflow-context
     capture --> clarify[Clarify problem, users, outcome, scope and non-goals]
 %% @airflow-context clarify
