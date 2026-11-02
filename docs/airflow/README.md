@@ -13,6 +13,24 @@ It is specifically for AI software development workflows: the diagrams describe
 stages, decisions, feedback loops and human approval gates for AI-assisted work.
 AIRFlow visualizes that process; it does not run agents or execute workflow steps.
 
+## Getting started
+
+Open **Get started** in the viewer and choose a setup method:
+
+- **Add AIRFlow to a repository** keeps the existing agent-specific setup for
+   GitHub Copilot, OpenAI Codex and Claude Code.
+- **GitHub Copilot Jumpstart** guides you through creating a GitHub repository
+   with the optional Copilot prompt, reviewing the resulting pull request,
+   requesting changes, merging the setup and resuming AIRFlow. It includes a
+   copyable prompt that requests setup and a concept proposal, stopping at human
+   decision gates rather than implementing an unapproved product.
+
+The setup method and coding agent are separate choices so method-specific guides
+can be added without replacing the existing agent instructions. Guide content
+lives in `index.html`; `updateSetupMethod` in `js/viewer.js` controls which guide
+and reference are visible. GitHub feature availability depends on account access
+and organization policies.
+
 ## Open a workflow
 
 - Default workflow: `airflow/` or `airflow/index.html`

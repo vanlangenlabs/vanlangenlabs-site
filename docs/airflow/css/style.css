@@ -134,6 +134,9 @@ dialog h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 20px 0
 dialog pre { border: 1px solid var(--line); border-radius: 4px; background: var(--page); max-height: 320px; }
 #ai-copy-status { color: var(--muted); font-size: 12px; line-height: 1.6; }
 #ai-reference { white-space: pre-wrap; overflow-wrap: anywhere; }
+#jumpstart-prompt { white-space: pre-wrap; overflow-wrap: anywhere; }
+#jumpstart-copy-status { color: var(--muted); font-size: 12px; line-height: 1.6; }
+#jumpstart-copy-status:empty { display: none; }
 #ai-copy-status:empty { display: none; }
 footer { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); padding-block: 25px; font-size: 11px; }
 .footer-dot { color: #b55e47; padding-inline: 8px; }

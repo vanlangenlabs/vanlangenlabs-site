@@ -362,6 +362,32 @@ function updateAgentSetup() {
 byId('agent-select').addEventListener('change', updateAgentSetup);
 updateAgentSetup();
 
+function updateSetupMethod() {
+  const jumpstart = byId('setup-method').value === 'jumpstart';
+  byId('setup-existing').hidden = jumpstart;
+  byId('setup-reference').hidden = jumpstart;
+  byId('setup-jumpstart').hidden = !jumpstart;
+  byId('jumpstart-copy-status').textContent = '';
+}
+byId('setup-method').addEventListener('change', updateSetupMethod);
+updateSetupMethod();
+
+byId('copy-jumpstart').addEventListener('click', async () => {
+  const prompt = byId('jumpstart-prompt');
+  const status = byId('jumpstart-copy-status');
+  try {
+    await navigator.clipboard.writeText(prompt.textContent);
+    status.textContent = 'Prompt copied.';
+  } catch {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(prompt);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    status.textContent = 'Clipboard unavailable. The prompt is selected; copy it manually.';
+  }
+});
+
 async function loadInstructions() {
   try {
     const response = await fetch(new URL('copilot-instructions.md', location.href), { cache: 'no-cache' });
