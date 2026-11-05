@@ -495,11 +495,15 @@ product”:
     but does not yet define or approve a Concept.
 2. Check existing `.air/` records and prior interactions. Do not ask for facts already
     supplied. Start a Question interaction for the missing project-level information.
-3. In an interactive environment, ask a small number of focused questions, for
-    example: who has the problem, what are they trying to achieve, how is it handled
-    today, and what outcome would make the product useful? Ask further questions only
-    when the answers reveal a material gap. In an asynchronous environment, send the
-    related questions together and pause in `awaiting-input`.
+3. For a new project, ask focused questions covering these areas, adapting the
+   wording and omitting anything already answered:
+   - What problem or need should the project address, and how is it handled today?
+   - Who experiences the problem, and in what situation?
+   - What useful outcome should the project create, and how would success be recognized?
+   - What belongs within the project's boundaries, and what should be out of scope for now?
+   Ask follow-up questions only when answers reveal a material gap. In an
+   asynchronous environment, send the related questions together and pause in
+   `awaiting-input`.
 4. Draft `.air/concept.md` from the answers. Distinguish confirmed facts from
     assumptions and open questions. Do not add technical design or turn every idea
     into an approved feature.
