@@ -215,7 +215,7 @@ Use the viewer URL for people and the method entry for agents:
 | Audience | URL |
 | --- | --- |
 | Human diagram viewer | `https://vanlangen.org/airflow/?flow=project` |
-| AI method entry | `https://vanlangen.org/airflow/airflow.md` |
+| AI method entry | `https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/airflow.md` |
 
 ### Quick setup
 
@@ -259,7 +259,8 @@ the selected diagram's raw URL as reference context only. The agent first reads 
 viewing Design or another child. If clipboard access
 fails, the popup opens and selects the text for manual copying.
 
-The standard file's entry URL targets the public `airflow.md`. The optional
+The standard file's entry URL targets the raw GitHub `airflow.md`; its Project
+and flow references resolve relative to that URL. The optional
 selected-diagram context uses the current viewer's host and path; a localhost
 URL only works where that server is reachable. Copy from the public viewer when
 sharing that context remotely. To self-host or use local files, change the entry

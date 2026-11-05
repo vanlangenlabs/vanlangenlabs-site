@@ -104,7 +104,7 @@
             <li>Open <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">GitHub's new repository page</a>. Choose the owner, repository name and visibility, and complete the repository settings.</li>
             <li>Find <strong>Jumpstart your project with Copilot (optional)</strong>. Paste the prompt below, replacing the project description and constraints with your own. Do not include passwords, tokens or other secrets.</li>
             <li>Create the repository with the prompt included. Follow GitHub's link to the Copilot task or pull request. Copilot works asynchronously; the session log shows its progress and any access problems.</li>
-            <li>In the new repository, open <strong>Settings &gt; Copilot &gt; Internet access</strong>. Under <strong>Copilot in the cloud</strong> (not Copilot code review), open <strong>Custom allowlist</strong>. Add <code>https://vanlangen.org/airflow/</code>, click <strong>Add rule</strong>, then <strong>Save changes</strong>. This allows both <code>airflow.md</code> and the underlying <code>flows/</code> sources. Keep the firewall enabled.</li>
+            <li>In the new repository, open <strong>Settings &gt; Copilot &gt; Internet access</strong>. Under <strong>Copilot in the cloud</strong> (not Copilot code review), open <strong>Custom allowlist</strong>. Add <code>https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/</code>, click <strong>Add rule</strong>, then <strong>Save changes</strong>. This allows <code>airflow.md</code> and its relative <code>flows/</code> sources. Keep the firewall enabled.</li>
             <li>If custom rules are locked by your organization, ask an organization administrator to add the same rule to the organization allowlist or enable repository custom rules. The agent cannot grant itself this access.</li>
             <li>If the initial Jumpstart task was blocked before you saved the rule, start a new Copilot task after saving. Ask it to read the repository instructions (or use the Jumpstart prompt again if setup is incomplete), retrieve AIRFlow and resume any existing records without replacing them. Check the pull request body, comments or session log for firewall warnings showing the blocked address and command.</li>
             <li>Open the pull request and read its description, changed files and check results. This prompt asks for AIRFlow setup and an initial concept proposal, not a finished application. Check that <code>.github/copilot-instructions.md</code> points to AIRFlow and that no product implementation has started without your approval.</li>
@@ -118,11 +118,11 @@
 Project idea: [Describe the product, its users and the problem it solves.]
 Constraints: [Describe known requirements, preferred stack, or write "not decided yet".]
 
-Read https://vanlangen.org/airflow/airflow.md and follow its Project entry point and referenced source flows. If you cannot access them, report the blocker instead of inventing the workflow.
+Read https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/airflow.md and follow its Project entry point and referenced source flows, resolving relative paths from that URL and keeping all sources on the same version. If you cannot access them, report the blocker instead of inventing the workflow.
 
 Create .github/copilot-instructions.md with this reference, preserving any existing instructions:
 # AIRFlow
-For development work, read and follow https://vanlangen.org/airflow/airflow.md before acting or resuming. It defines the workflow and links to its Mermaid flows. If inaccessible, report the limitation and request an accessible copy; do not guess.
+For development work, read and follow https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/airflow.md before acting or resuming. Resolve its Project and flow links relative to that URL and keep all sources on the same version. If inaccessible, report the limitation and request an accessible copy; do not guess.
 
 Initialize the consuming project's .air/ records as directed by AIRFlow. Start with the concept for the project idea above. Do not invent missing product decisions or approve records on my behalf. Stop at the first human decision or approval gate and present the exact record version, open questions and next action in the pull request. Do not implement product code before the required approvals.
 
