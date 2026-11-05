@@ -335,9 +335,12 @@ Use a Question when required information or a user decision is missing.
 
 1. Inspect the active `.air/` records, relevant previous interactions and active
     subflow before asking. Do not ask for information already available.
-2. Ask only focused questions needed for the current phase. In interactive channels,
-    ask incrementally when an answer can narrow the next question. In asynchronous
-    channels, combine related questions into one concise request.
+2. Compare the available information with the active phase's required record
+   outline and identify what is still missing to proceed. Ask the user for those
+   specific details; do not make them guess what information you need or ask for
+   facts already available. In interactive channels, ask incrementally when an
+   answer can narrow the next question. In asynchronous channels, combine related
+   questions into one concise request.
 3. Explain why the answer is needed when that is not self-evident. Offer bounded
     options when the workflow defines them; do not make up choices that change scope.
 4. Never invent product requirements, user intent, decisions or approval. A partial
@@ -495,15 +498,15 @@ product”:
     but does not yet define or approve a Concept.
 2. Check existing `.air/` records and prior interactions. Do not ask for facts already
     supplied. Start a Question interaction for the missing project-level information.
-3. For a new project, ask focused questions covering these areas, adapting the
-   wording and omitting anything already answered:
-   - What problem or need should the project address, and how is it handled today?
-   - Who experiences the problem, and in what situation?
-   - What useful outcome should the project create, and how would success be recognized?
-   - What belongs within the project's boundaries, and what should be out of scope for now?
-   Ask follow-up questions only when answers reveal a material gap. In an
-   asynchronous environment, send the related questions together and pause in
-   `awaiting-input`.
+3. If the project purpose is not already clear from the user's input and existing
+   context, start by asking what the user wants the project to do or what problem it
+   should solve. Then use the Concept outline (problem, intended users, desired
+   outcome, boundaries, non-goals and success measures) as a completeness check.
+   Identify which details are still missing and ask focused questions for those gaps
+   only. Do not present the outline as a fixed questionnaire or ask the user to
+   determine what information you need. Ask follow-up questions only when answers
+   reveal a material gap. In an asynchronous environment, send the related questions
+   together and pause in `awaiting-input`.
 4. Draft `.air/concept.md` from the answers. Distinguish confirmed facts from
     assumptions and open questions. Do not add technical design or turn every idea
     into an approved feature.
