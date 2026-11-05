@@ -97,26 +97,22 @@
         </section>
         <section id="setup-jumpstart" aria-labelledby="jumpstart-title" hidden>
           <h3 id="jumpstart-title">New GitHub repository with Copilot</h3>
-          <p>Start on GitHub without a local checkout. Your initial prompt becomes a task for Copilot's cloud agent, which prepares changes in a branch and opens a pull request for you to review.</p>
+          <p>Start on GitHub without a local checkout. Copilot prepares the AIRFlow setup in a branch and opens a pull request. You do not need a product name or project description yet: the first task asks you questions in the pull request and waits for your answers before drafting the concept.</p>
           <p><strong>Before you start:</strong> sign in to a GitHub account with access to Copilot's coding agent. Availability depends on your plan and organization policies; usage limits may apply. If the Jumpstart option is missing, create the repository normally and use the other setup method.</p>
-          <p><strong>Network access:</strong> AIRFlow is public, but Copilot's environment can still block it. Allow access to the AIRFlow instructions and flows in the repository's Copilot firewall settings once the repository exists.</p>
+          <p><strong>Network access:</strong> GitHub's Copilot Jumpstart agent can read AIRFlow's public raw GitHub files. No repository Copilot firewall setting needs to be changed for AIRFlow.</p>
           <ol>
-            <li>Open <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">GitHub's new repository page</a>. Choose the owner, repository name and visibility, and complete the repository settings.</li>
-            <li>Find <strong>Jumpstart your project with Copilot (optional)</strong>. Paste the prompt below, replacing the project description and constraints with your own. Do not include passwords, tokens or other secrets.</li>
+            <li>Open <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">GitHub's new repository page</a>. Choose the owner, repository name and visibility, and complete the repository settings. The repository needs a name, but it does not have to be the final product name.</li>
+            <li>Find <strong>Jumpstart your project with Copilot (optional)</strong> and paste the prompt below as-is. No project description or product decisions are needed yet. Do not include passwords, tokens or other secrets.</li>
             <li>Create the repository with the prompt included. Follow GitHub's link to the Copilot task or pull request. Copilot works asynchronously; the session log shows its progress and any access problems.</li>
-            <li>In the new repository, open <strong>Settings &gt; Copilot &gt; Internet access</strong>. Under <strong>Copilot in the cloud</strong> (not Copilot code review), open <strong>Custom allowlist</strong>. Add <code>https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/</code>, click <strong>Add rule</strong>, then <strong>Save changes</strong>. This allows <code>airflow.md</code> and its relative <code>flows/</code> sources. Keep the firewall enabled.</li>
-            <li>If custom rules are locked by your organization, ask an organization administrator to add the same rule to the organization allowlist or enable repository custom rules. The agent cannot grant itself this access.</li>
-            <li>If the initial Jumpstart task was blocked before you saved the rule, start a new Copilot task after saving. Ask it to read the repository instructions (or use the Jumpstart prompt again if setup is incomplete), retrieve AIRFlow and resume any existing records without replacing them. Check the pull request body, comments or session log for firewall warnings showing the blocked address and command.</li>
-            <li>Open the pull request and read its description, changed files and check results. This prompt asks for AIRFlow setup and an initial concept proposal, not a finished application. Check that <code>.github/copilot-instructions.md</code> points to AIRFlow and that no product implementation has started without your approval.</li>
-            <li>Request changes in the pull request with <code>@copilot</code> and concrete feedback. When AIRFlow asks for a decision, state exactly which record and version you approve. A merge alone is not approval of every AIRFlow record.</li>
-            <li>Once the setup changes are satisfactory and required checks pass, mark the pull request ready for review if it is still a draft, then merge it when permitted. Continue with a new Copilot task or your local coding agent, asking it to read the repository instructions and resume AIRFlow from <code>.air/index.md</code>.</li>
+            <li>If AIRFlow retrieval fails, inspect the pull request body, comments or session log for the exact URL and fetch error. Report the blocker; do not change repository firewall settings as part of AIRFlow setup.</li>
+            <li>Read the pull request description and check that <code>.github/copilot-instructions.md</code> points to AIRFlow. The pull request should include a section titled <strong>Questions for the project owner</strong>. Copilot must not invent project details, draft or approve the concept, or implement product code before you respond.</li>
+            <li>Reply with your answers in one pull request comment and include <code>@copilot</code> to start the next task. A plain comment may not resume Copilot. If it asks follow-up questions, reply with <code>@copilot</code> again whenever you want it to continue. If the initial questions are missing, use <code>@copilot</code> to ask for them. Do not merge the pull request yet.</li>
+            <li>After your reply, Copilot should use your answers to draft <code>.air/concept.md</code> and request your review. Ask for revisions in the pull request if needed. Approve only the exact concept version you agree with; merging alone is not approval.</li>
+            <li>Once the setup and concept are satisfactory and required checks pass, merge the pull request when permitted. Continue with a new Copilot task or your local coding agent, asking it to read the repository instructions and resume AIRFlow from <code>.air/index.md</code>.</li>
           </ol>
           <div class="reference-heading"><h3>Jumpstart prompt</h3><button id="copy-jumpstart" type="button">Copy prompt</button></div>
           <p id="jumpstart-copy-status" role="status" aria-live="polite"></p>
-          <pre><code id="jumpstart-prompt">Set up this new repository to use AIRFlow.
-
-Project idea: [Describe the product, its users and the problem it solves.]
-Constraints: [Describe known requirements, preferred stack, or write "not decided yet".]
+          <pre><code id="jumpstart-prompt">Set up this new repository to use AIRFlow. Do not assume or invent a product name, project idea, users, requirements or technical choices.
 
 Read https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/airflow.md and follow its Project entry point and referenced source flows, resolving relative paths from that URL and keeping all sources on the same version. If you cannot access them, report the blocker instead of inventing the workflow.
 
@@ -124,11 +120,19 @@ Create .github/copilot-instructions.md with this reference, preserving any exist
 # AIRFlow
 For development work, read and follow https://raw.githubusercontent.com/vanlangenlabs/vanlangenlabs-site/refs/heads/main/docs/airflow/airflow.md before acting or resuming. Resolve its Project and flow links relative to that URL and keep all sources on the same version. If inaccessible, report the limitation and request an accessible copy; do not guess.
 
-Initialize the consuming project's .air/ records as directed by AIRFlow. Start with the concept for the project idea above. Do not invent missing product decisions or approve records on my behalf. Stop at the first human decision or approval gate and present the exact record version, open questions and next action in the pull request. Do not implement product code before the required approvals.
+Initialize the consuming project's .air/ workspace as directed by AIRFlow, preserving existing files. Do not draft .air/concept.md or proceed to feature intake until I have answered the questions below. Do not invent missing decisions, approve records on my behalf or implement product code.
 
-Use the pull request to explain the setup changes, checks performed and how to resume the workflow.</code></pre>
-          <p>If the cloud session stops while waiting for approval, continue in a new task with the same repository records. If access still fails after allowing the URL, inspect the exact fetch error. Some web-reading tools cannot process the MIME type GitHub Pages assigns to <code>.mmd</code> files; use a permitted text-download tool to read the original source. If retrieval remains unavailable, provide an accessible, consistent copy of the instructions and flows before proceeding.</p>
-          <p><a href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-the-firewall" target="_blank" rel="noopener noreferrer">GitHub documentation: configure the Copilot firewall</a></p>
+Use the pull request to explain the setup changes, checks performed and how to resume the workflow. Record the unanswered questions and next action as a pending interaction in .air/index.md. Include the questions below in a clearly titled "Questions for the project owner" section of the pull request description, or post them as a pull request comment if available. Tell me to put my answers in one pull request comment and include @copilot to start the next task; a plain comment may not resume the agent. For every later reply that needs action, tell me to mention @copilot again. End this task after asking; do not continue until I respond.
+
+## Questions for the project owner
+
+1. What problem or need should this project address? How is it handled today?
+2. Who experiences this problem, and in what situation?
+3. What useful outcome should the project create? How would we recognize success?
+4. What should be included in the project's boundaries, and what should explicitly be out of scope for now?
+
+After I answer, resume from .air/index.md, use my answers to draft .air/concept.md, and present that exact version for review and explicit approval. Keep any unresolved questions visible. Do not begin feature intake or implementation until the concept is approved.</code></pre>
+          <p>If the cloud session stops while waiting for approval, continue in a new task with the same repository records. If AIRFlow retrieval fails, inspect and report the exact fetch error instead of changing repository firewall settings or guessing. Some web-reading tools cannot process the MIME type GitHub Pages assigns to <code>.mmd</code> files; use a permitted text-download tool to read the original source. If retrieval remains unavailable, provide an accessible, consistent copy of the instructions and flows before proceeding.</p>
           <p><a href="https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent" target="_blank" rel="noopener noreferrer">GitHub documentation: Copilot coding agent</a></p>
         </section>
         <p><strong>AIRFlow provides the workflow, not the skills or tools.</strong> It guides your coding agent through development stages, checks and approvals. Your agent uses its own capabilities, available skills and tools to carry out the work.</p>
