@@ -62,7 +62,14 @@
     sparkleFrequency: 3.5,
 
     // Speed of shimmer bands.
-    sparkleSpeed: 0.35
+    sparkleSpeed: 0.35,
+
+    // Vertical offset of the logo from the screen center, as a fraction of
+    // screen height. Positive moves the logo up.
+    // 0.00 = centered
+    // 0.08 = slightly higher
+    // 0.15 = clearly above center
+    logoVerticalOffset: 0.08
   };
 
   const canvas = document.getElementById("glcanvas");
@@ -132,6 +139,7 @@
     uniform float u_sparkleSharpness;
     uniform float u_sparkleFrequency;
     uniform float u_sparkleSpeed;
+    uniform float u_logoVerticalOffset;
 
     in vec2 v_uv;
     out vec4 outColor;
@@ -213,7 +221,9 @@
         u_logoMaxSizePx
       );
 
-      vec2 centered = pixel - u_resolution * 0.5;
+      // Shift the logo up by a fraction of screen height.
+      vec2 logoCenter = u_resolution * (0.5 + vec2(0.0, u_logoVerticalOffset));
+      vec2 centered = pixel - logoCenter;
       vec2 logoUv = centered / logoSizePx + 0.5;
 
       float baseInside =
@@ -356,7 +366,8 @@
     sparkleIntensity: gl.getUniformLocation(program, "u_sparkleIntensity"),
     sparkleSharpness: gl.getUniformLocation(program, "u_sparkleSharpness"),
     sparkleFrequency: gl.getUniformLocation(program, "u_sparkleFrequency"),
-    sparkleSpeed: gl.getUniformLocation(program, "u_sparkleSpeed")
+    sparkleSpeed: gl.getUniformLocation(program, "u_sparkleSpeed"),
+    logoVerticalOffset: gl.getUniformLocation(program, "u_logoVerticalOffset")
   };
 
   const vao = gl.createVertexArray();
@@ -465,6 +476,7 @@
     gl.uniform1f(locations.sparkleSharpness, CONFIG.sparkleSharpness);
     gl.uniform1f(locations.sparkleFrequency, CONFIG.sparkleFrequency);
     gl.uniform1f(locations.sparkleSpeed, CONFIG.sparkleSpeed);
+    gl.uniform1f(locations.logoVerticalOffset, CONFIG.logoVerticalOffset);
   }
 
   function render(timeMs) {

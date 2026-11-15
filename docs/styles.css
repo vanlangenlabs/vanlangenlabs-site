@@ -123,7 +123,8 @@ canvas {
 .fallback-logo {
   position: fixed;
   left: 50%;
-  top: 50vh;
+  /* Matches CONFIG.logoVerticalOffset (0.08) in logo.js: 8vh above center. */
+  top: 42vh;
   transform: translate(-50%, -50%);
   width: min(72vw, 420px);
   height: auto;
