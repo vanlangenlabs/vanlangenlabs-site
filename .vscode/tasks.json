@@ -2,33 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Serve docs (py)",
+      "label": "Serve docs",
       "type": "shell",
-      "command": "py",
-      "args": ["-m", "http.server", "8000", "--directory", "docs"],
-      "isBackground": true,
-      "problemMatcher": [
-        {
-          "pattern": {
-            "regexp": ".*"
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": ".*",
-            "endsPattern": "Serving HTTP on"
-          }
-        }
-      ],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": false
-      }
-    },
-    {
-      "label": "Serve docs (python)",
-      "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["-m", "http.server", "8000", "--directory", "docs"],
       "isBackground": true,
       "problemMatcher": [

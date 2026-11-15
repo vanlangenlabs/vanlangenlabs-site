@@ -1,23 +1,13 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "Launch docs site (py)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:8000",
-      "webRoot": "${workspaceFolder}/docs",
-      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
-      "preLaunchTask": "Serve docs (py)"
-    },
-    {
-      "name": "Launch docs site (python)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:8000",
-      "webRoot": "${workspaceFolder}/docs",
-      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
-      "preLaunchTask": "Serve docs (python)"
-    }
+{
+    "type": "chrome",
+    "request": "launch",
+    "name": "Launch Chrome",
+    "url": "http://localhost:8000",
+    "webRoot": "${workspaceFolder}",
+    "runtimeExecutable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+}
   ]
 }
